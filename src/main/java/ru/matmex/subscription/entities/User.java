@@ -4,11 +4,7 @@ import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReferenceArray;
 
-/**
- * @author Nechaev Roman
- */
 @Entity
 @Table(name = "users")
 public class User {

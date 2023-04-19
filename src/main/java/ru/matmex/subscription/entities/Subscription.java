@@ -4,9 +4,6 @@ import jakarta.persistence.*;
 
 import java.util.Date;
 
-/**
- * @author Nechaev Roman
- */
 @Entity
 @Table(name = "Subscriptions")
 public class Subscription {
