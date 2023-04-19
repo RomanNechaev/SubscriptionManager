@@ -1,0 +1,71 @@
+package ru.matmex.subscription.entities;
+
+import jakarta.persistence.*;
+
+import java.util.Date;
+
+/**
+ * @author Nechaev Roman
+ */
+@Entity
+@Table(name = "Subscriptions")
+public class Subscription {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+    private Double price;
+    private Date paymentDate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Category category;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User user;
+
+    public Subscription() {}
+
+    public Subscription(String name, Double price, Date paymentDate, Category category, User user) {
+        this.name = name;
+        this.price = price;
+        this.paymentDate = paymentDate;
+        this.category = category;
+        this.user = user;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public Date getPaymentDate() {
+        return paymentDate;
+    }
+
+    public void setPaymentDate(Date paymentDate) {
+        this.paymentDate = paymentDate;
+    }
+}
