@@ -1,10 +1,11 @@
-package ru.matmex.subscription.services;
+package ru.matmex.subscription.services.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import ru.matmex.subscription.entities.User;
 import ru.matmex.subscription.repositories.UserRepository;
+import ru.matmex.subscription.services.UserService;
 
 @Component
 public class UserServiceImpl implements UserService {
@@ -30,10 +31,13 @@ public class UserServiceImpl implements UserService {
     public void updateUsername(Long id,String newUsername) {
         User user = userRepository.getById(id).orElseThrow(()-> new UsernameNotFoundException("User not found"));
         user.setUsername(newUsername);
+        //TODO переделать под модель
     }
 
     @Override
-    public void updatePassword(String username) {
-        //TODO
+    public void updatePassword(String username, String newPassword) {
+        User user = loadByUsername(username);
+        user.setPassword(newPassword);
+        //TODO переделать под модель
     }
 }
