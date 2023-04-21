@@ -28,16 +28,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUsername(Long id,String newUsername) {
-        User user = userRepository.getById(id).orElseThrow(()-> new UsernameNotFoundException("User not found"));
+    public void updateUsername(Long id, String newUsername) {
+        User user = userRepository.getById(id).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         user.setUsername(newUsername);
-        //TODO переделать под модель
-    }
-
-    @Override
-    public void updatePassword(String username, String newPassword) {
-        User user = loadByUsername(username);
-        user.setPassword(newPassword);
-        //TODO переделать под модель
+        //TODO
     }
 }
