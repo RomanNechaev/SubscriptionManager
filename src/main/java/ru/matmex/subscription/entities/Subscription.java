@@ -19,7 +19,6 @@ public class Subscription {
     private Category category;
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
-
     public Subscription() {}
 
     public Subscription(String name, Double price, Date paymentDate, Category category, User user) {
@@ -28,6 +27,9 @@ public class Subscription {
         this.paymentDate = paymentDate;
         this.category = category;
         this.user = user;
+    }
+    public Long getId() {
+        return id;
     }
 
     public Category getCategory() {
