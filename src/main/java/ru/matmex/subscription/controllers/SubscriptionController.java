@@ -3,11 +3,12 @@ package ru.matmex.subscription.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import ru.matmex.subscription.entities.Subscription;
+import org.springframework.web.bind.annotation.*;
 import ru.matmex.subscription.entities.User;
+import ru.matmex.subscription.models.SubscriptionModel;
 import ru.matmex.subscription.services.SubscriptionService;
 import ru.matmex.subscription.services.UserService;
+import ru.matmex.subscription.services.utils.MappingUtils;
 
 import java.util.List;
 
@@ -22,10 +23,30 @@ public class SubscriptionController {
         this.subscriptionService = subscriptionService;
     }
 
-    @GetMapping(value = "/subscription/username")
-    public ResponseEntity<List<Subscription>> getSubscriptionByUsername(String username) {
+    @GetMapping(value = "/subscriptions/{username}")
+    public ResponseEntity<List<SubscriptionModel>> getSubscriptionsByUsername(@PathVariable String username) {
         User user = userService.loadByUsername(username);
         return ResponseEntity.ok(subscriptionService.getSubscriptions(user));
     }
 
+    @GetMapping(value = "/subscription/{username}/{name}")
+    public ResponseEntity<SubscriptionModel> getSubscriptionByName(@PathVariable String username, @PathVariable String name) {
+        User user = userService.loadByUsername(username);
+        return ResponseEntity.ok(subscriptionService.getSubscription(user, name));
+    }
+
+    @PostMapping(value = "/subscription")
+    public ResponseEntity<SubscriptionModel> create(@RequestBody SubscriptionModel subscriptionModel) {
+        return ResponseEntity.ok(MappingUtils.mapToSubscriptionModel(subscriptionService.createSubscription(subscriptionModel)));
+    }
+
+    @PutMapping(value = "/subscription")
+    public ResponseEntity<SubscriptionModel> update(@RequestBody SubscriptionModel subscriptionModel) {
+        return ResponseEntity.ok(MappingUtils.mapToSubscriptionModel(subscriptionService.updateSubscription(subscriptionModel)));
+    }
+
+    @DeleteMapping(value = "/subscription{id}")
+    public void delete(@PathVariable Long id) {
+        subscriptionService.deleteSubscription(id);
+    }
 }
