@@ -1,4 +1,4 @@
-package ru.matmex.subscription.models;
+package ru.matmex.subscription.models.user;
 
 public class UserRegistrationModel {
     private String username;
