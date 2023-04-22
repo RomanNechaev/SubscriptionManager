@@ -4,8 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import ru.matmex.subscription.entities.User;
+import ru.matmex.subscription.models.user.UserModel;
+import ru.matmex.subscription.models.user.UserRegistrationModel;
+import ru.matmex.subscription.models.user.UserUpdateModel;
 import ru.matmex.subscription.repositories.UserRepository;
 import ru.matmex.subscription.services.UserService;
+import ru.matmex.subscription.services.utils.MappingUtils;
 
 @Component
 public class UserServiceImpl implements UserService {
@@ -18,19 +22,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User loadByUsername(String username) {
-        return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User with name:" + username + "not found"));
+    public UserModel loadByUsername(String username) {
+        return MappingUtils.mapToUserModel(userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User with name:" + username + "not found")));
     }
 
     @Override
-    public void adduser(User user) {
-        userRepository.findByUsername(user.getUsername()).orElse(userRepository.save(user));
+    public void adduser(UserRegistrationModel userRegistrationModel) {
+        userRepository.findByUsername(userRegistrationModel.getUsername()).orElse(userRepository.save(MappingUtils.mapToUserEntity(userRegistrationModel)));
     }
 
     @Override
-    public void updateUsername(Long id, String newUsername) {
-        User user = userRepository.getById(id).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        user.setUsername(newUsername);
-        //TODO
+    public UserModel updateUsername(UserUpdateModel userUpdateModel) {
+        User user = userRepository.getById(userUpdateModel.getId()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        user.setUsername(userUpdateModel.getUsername());
+        user.setEmail(userUpdateModel.getEmail());
+        userRepository.save(user);
+        return MappingUtils.mapToUserModel(user);
+    }
+
+    @Override
+    public User getCurrentUser() {
+        return null;
     }
 }
