@@ -1,20 +1,21 @@
 package ru.matmex.subscription.services;
 
 import ru.matmex.subscription.entities.Subscription;
-import ru.matmex.subscription.entities.User;
-import ru.matmex.subscription.models.SubscriptionModel;
+import ru.matmex.subscription.models.subscription.CreateSubscriptionModel;
+import ru.matmex.subscription.models.subscription.SubscriptionModel;
+import ru.matmex.subscription.models.subscription.UpdateSubscriptionModel;
 
 import java.util.List;
 
 public interface SubscriptionService {
-    List<SubscriptionModel> getSubscriptions(User user);
+    List<SubscriptionModel> getSubscriptions();
 
-    SubscriptionModel getSubscription(User user, String name);
+    SubscriptionModel getSubscription(String name);
 
-    Subscription createSubscription(SubscriptionModel subscriptionModel);
+    SubscriptionModel createSubscription(CreateSubscriptionModel createSubscriptionModel);
 
     void deleteSubscription(Long id);
 
-    Subscription updateSubscription(SubscriptionModel subscriptionModel);
+    SubscriptionModel updateSubscription(UpdateSubscriptionModel updateSubscriptionModel);
 
 }
