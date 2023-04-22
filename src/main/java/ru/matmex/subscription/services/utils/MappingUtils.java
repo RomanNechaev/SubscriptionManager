@@ -4,12 +4,25 @@ import org.springframework.stereotype.Component;
 import ru.matmex.subscription.entities.Category;
 import ru.matmex.subscription.entities.Subscription;
 import ru.matmex.subscription.entities.User;
-import ru.matmex.subscription.models.CategoryModel;
-import ru.matmex.subscription.models.SubscriptionModel;
-import ru.matmex.subscription.models.UserModel;
+import ru.matmex.subscription.models.category.CategoryModel;
+import ru.matmex.subscription.models.subscription.CreateSubscriptionModel;
+import ru.matmex.subscription.models.subscription.SubscriptionModel;
+import ru.matmex.subscription.models.user.UserModel;
+import ru.matmex.subscription.models.user.UserRegistrationModel;
+import ru.matmex.subscription.services.CategoryService;
+import ru.matmex.subscription.services.UserService;
 
 @Component
 public class MappingUtils {
+    private final CategoryService categoryService;
+    private final UserService userService;
+
+    public MappingUtils(CategoryService categoryService, UserService userService) {
+        this.categoryService = categoryService;
+        this.userService = userService;
+
+    }
+
     public static UserModel mapToUserModel(User userEntity) {
         UserModel userModel = new UserModel();
         userModel.setId(userEntity.getId());
@@ -27,6 +40,7 @@ public class MappingUtils {
         subscriptionModel.setPaymentDate(subscription.getPaymentDate());
         return subscriptionModel;
     }
+
     public static CategoryModel mapToCategoryModel(Category category) {
         CategoryModel categoryModel = new CategoryModel();
         categoryModel.setId(category.getId());
@@ -36,19 +50,28 @@ public class MappingUtils {
         return categoryModel;
     }
 
-    public static Subscription mapToSubscriptionEntity(SubscriptionModel subscriptionModel) {
-        return new Subscription(subscriptionModel.getName(),subscriptionModel.getPrice(),subscriptionModel.getPaymentDate()
-                ,mapToCategoryEntity(subscriptionModel.getCategory()),
-                mapToUserEntity(subscriptionModel.getUser()));
+    public Subscription mapToSubscriptionEntity(CreateSubscriptionModel createSubscriptionModel) {
+        return new Subscription(
+                createSubscriptionModel.getName(),
+                createSubscriptionModel.getPrice(),
+                Parser.parseToDate(createSubscriptionModel.getPaymentDate()),
+                mapToCategoryEntity(categoryService.createIfNotExists(createSubscriptionModel.getCategory())),
+                userService.getCurrentUser()
+        );
     }
 
-    public static User mapToUserEntity(UserModel userModel) {
+    public User mapToUserEntity(UserModel userModel) {
         return null;
         //TODO
     }
 
-    public static Category mapToCategoryEntity(CategoryModel categoryModel) {
-        return new Category(categoryModel.getName(),categoryModel.getSubscriptions().stream().map(MappingUtils::mapToSubscriptionEntity).toList(),mapToUserEntity(categoryModel.getUser()));
+    public static User mapToUserEntity(UserRegistrationModel userModel) {
+        return new User(userModel.getUsername(), userModel.getEmail(), userModel.getPassword());
+    }
+
+    public Category mapToCategoryEntity(CategoryModel categoryModel) {
+        return null;
+        //TODO
     }
 
 }
