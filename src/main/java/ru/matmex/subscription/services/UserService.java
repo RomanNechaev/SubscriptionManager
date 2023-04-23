@@ -8,7 +8,7 @@ import ru.matmex.subscription.models.user.UserUpdateModel;
 public interface UserService {
     UserModel loadByUsername(String username);
 
-    void adduser(UserRegistrationModel user);
+    void addUser(UserRegistrationModel user);
     UserModel updateUsername(UserUpdateModel userUpdateModel);
 
     User getCurrentUser();

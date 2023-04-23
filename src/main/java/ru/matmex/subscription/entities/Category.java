@@ -21,7 +21,8 @@ public class Category {
     public Category() {
     }
 
-    public Category(String name, List<Subscription> subscriptions, User user) {
+    public Category(Long id, String name, List<Subscription> subscriptions, User user) {
+        this.id = id;
         this.name = name;
         this.subscriptions = subscriptions;
         this.user = user;

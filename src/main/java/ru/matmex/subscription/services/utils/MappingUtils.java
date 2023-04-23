@@ -1,5 +1,6 @@
 package ru.matmex.subscription.services.utils;
 
+import org.hibernate.mapping.List;
 import org.springframework.stereotype.Component;
 import ru.matmex.subscription.entities.Category;
 import ru.matmex.subscription.entities.Subscription;
@@ -42,12 +43,11 @@ public class MappingUtils {
     }
 
     public static CategoryModel mapToCategoryModel(Category category) {
-        CategoryModel categoryModel = new CategoryModel();
-        categoryModel.setId(category.getId());
-        categoryModel.setName(category.getName());
-        categoryModel.setUser(mapToUserModel(category.getUser()));
-        categoryModel.setSubscriptions(category.getSubscriptions().stream().map(MappingUtils::mapToSubscriptionModel).toList());
-        return categoryModel;
+        return new CategoryModel(
+                category.getId(),
+                category.getName(),
+                category.getSubscriptions().stream().map(MappingUtils::mapToSubscriptionModel).toList(),
+                mapToUserModel(category.getUser()));
     }
 
     public Subscription mapToSubscriptionEntity(CreateSubscriptionModel createSubscriptionModel) {
@@ -70,6 +70,13 @@ public class MappingUtils {
     }
 
     public Category mapToCategoryEntity(CategoryModel categoryModel) {
+//        return new Category(
+//                categoryModel.id(),
+//                categoryModel.name(),
+//                categoryModel.subscriptions().stream().map(
+//                        (SubscriptionModel createSubscriptionModel) -> mapToSubscriptionEntity(createSubscriptionModel)).toList(),
+//                categoryModel.user()
+//                );
         return null;
         //TODO
     }

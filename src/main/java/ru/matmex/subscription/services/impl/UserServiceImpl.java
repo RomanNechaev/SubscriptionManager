@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void adduser(UserRegistrationModel userRegistrationModel) {
+    public void addUser(UserRegistrationModel userRegistrationModel) {
         userRepository.findByUsername(userRegistrationModel.getUsername()).orElse(userRepository.save(MappingUtils.mapToUserEntity(userRegistrationModel)));
     }
 
