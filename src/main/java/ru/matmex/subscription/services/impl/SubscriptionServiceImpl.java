@@ -56,11 +56,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public SubscriptionModel updateSubscription(UpdateSubscriptionModel updateSubscriptionModel) {
-        Subscription subscription = subscriptionRepository.findById(updateSubscriptionModel.getId()).orElseThrow(EntityNotFoundException::new);
-        subscription.setCategory(mapper.mapToCategoryEntity(categoryService.getCategory(updateSubscriptionModel.getCategory())));
-        subscription.setName(updateSubscriptionModel.getName());
-        subscription.setPrice(updateSubscriptionModel.getPrice());
-        subscription.setPaymentDate(Parser.parseToDate(updateSubscriptionModel.getPaymentDate()));
+        Subscription subscription = subscriptionRepository.findById(updateSubscriptionModel.id()).orElseThrow(EntityNotFoundException::new);
+        subscription.setCategory(mapper.mapToCategoryEntity(categoryService.getCategory(updateSubscriptionModel.category())));
+        subscription.setName(updateSubscriptionModel.name());
+        subscription.setPrice(updateSubscriptionModel.price());
+        subscription.setPaymentDate(Parser.parseToDate(updateSubscriptionModel.paymentDate()));
         subscriptionRepository.save(subscription);
         return MappingUtils.mapToSubscriptionModel(subscription);
     }

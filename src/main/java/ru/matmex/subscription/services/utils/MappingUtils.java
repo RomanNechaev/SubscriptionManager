@@ -49,13 +49,12 @@ public class MappingUtils {
         categoryModel.setSubscriptions(category.getSubscriptions().stream().map(MappingUtils::mapToSubscriptionModel).toList());
         return categoryModel;
     }
-
     public Subscription mapToSubscriptionEntity(CreateSubscriptionModel createSubscriptionModel) {
         return new Subscription(
-                createSubscriptionModel.getName(),
-                createSubscriptionModel.getPrice(),
-                Parser.parseToDate(createSubscriptionModel.getPaymentDate()),
-                mapToCategoryEntity(categoryService.createIfNotExists(createSubscriptionModel.getCategory())),
+                createSubscriptionModel.name(),
+                createSubscriptionModel.price(),
+                Parser.parseToDate(createSubscriptionModel.paymentDate()),
+                mapToCategoryEntity(categoryService.createIfNotExists(createSubscriptionModel.category())),
                 userService.getCurrentUser()
         );
     }
@@ -66,7 +65,7 @@ public class MappingUtils {
     }
 
     public static User mapToUserEntity(UserRegistrationModel userModel) {
-        return new User(userModel.getUsername(), userModel.getEmail(), userModel.getPassword());
+        return new User(userModel.username(), userModel.email(), userModel.password());
     }
 
     public Category mapToCategoryEntity(CategoryModel categoryModel) {
