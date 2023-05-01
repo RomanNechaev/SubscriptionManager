@@ -1,7 +1,10 @@
 package ru.matmex.subscription.services.impl;
 
+import jakarta.persistence.Access;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import ru.matmex.subscription.entities.Subscription;
 import ru.matmex.subscription.entities.User;
 import ru.matmex.subscription.models.subscription.CreateSubscriptionModel;
@@ -11,27 +14,31 @@ import ru.matmex.subscription.repositories.SubscriptionRepository;
 import ru.matmex.subscription.services.CategoryService;
 import ru.matmex.subscription.services.SubscriptionService;
 import ru.matmex.subscription.services.UserService;
-import ru.matmex.subscription.services.utils.MappingUtils;
 import ru.matmex.subscription.services.utils.Parser;
+import ru.matmex.subscription.services.utils.mapping.SubscriptionModelMapper;
 
 import java.util.List;
 import java.util.Objects;
 
-@Component
+@Service
 public class SubscriptionServiceImpl implements SubscriptionService {
     SubscriptionRepository subscriptionRepository;
     CategoryService categoryService;
     UserService userService;
-    private MappingUtils mapper;
+    SubscriptionModelMapper subscriptionModelMapper;
 
-    public SubscriptionServiceImpl(SubscriptionRepository subscriptionRepository, CategoryService categoryService, UserService userService) {
+    @Autowired
+    public SubscriptionServiceImpl(SubscriptionRepository subscriptionRepository, SubscriptionModelMapper subscriptionModelMapper,
+                                   CategoryService categoryService, UserService userService) {
         this.subscriptionRepository = subscriptionRepository;
-        this.mapper = new MappingUtils(categoryService, userService);
+        this.subscriptionModelMapper = subscriptionModelMapper;
+        this.categoryService = categoryService;
+        this.userService = userService;
     }
 
     @Override
     public List<SubscriptionModel> getSubscriptions() {
-        return getSubscriptionsByUser(userService.getCurrentUser()).stream().map(MappingUtils::mapToSubscriptionModel).toList();
+        return getSubscriptionsByUser(userService.getCurrentUser()).stream().map(subscriptionModelMapper).toList();
     }
 
     public List<Subscription> getSubscriptionsByUser(User user) {
@@ -39,12 +46,20 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     public SubscriptionModel getSubscription(String name) {
-        return getSubscriptions().stream().filter(sub -> Objects.equals(sub.getName(), name)).findFirst().orElseThrow(EntityNotFoundException::new);
+        return getSubscriptions().stream().filter(sub -> Objects.equals(sub.name(), name)).findFirst().orElseThrow(EntityNotFoundException::new);
     }
 
     @Override
     public SubscriptionModel createSubscription(CreateSubscriptionModel createSubscriptionModel) {
-        return MappingUtils.mapToSubscriptionModel(subscriptionRepository.save(mapper.mapToSubscriptionEntity(createSubscriptionModel)));
+        Subscription subscription = new Subscription(
+                createSubscriptionModel.name(),
+                createSubscriptionModel.price(),
+                Parser.parseToDate(createSubscriptionModel.paymentDate()),
+                categoryService.getCategory(createSubscriptionModel.category()),
+                userService.getCurrentUser()
+        );
+        subscriptionRepository.save(subscription);
+        return subscriptionModelMapper.build(subscription);
     }
 
     @Override
@@ -57,11 +72,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     public SubscriptionModel updateSubscription(UpdateSubscriptionModel updateSubscriptionModel) {
         Subscription subscription = subscriptionRepository.findById(updateSubscriptionModel.id()).orElseThrow(EntityNotFoundException::new);
-        subscription.setCategory(mapper.mapToCategoryEntity(categoryService.getCategory(updateSubscriptionModel.category())));
+        subscription.setCategory(categoryService.getCategory(updateSubscriptionModel.category()));
         subscription.setName(updateSubscriptionModel.name());
         subscription.setPrice(updateSubscriptionModel.price());
         subscription.setPaymentDate(Parser.parseToDate(updateSubscriptionModel.paymentDate()));
         subscriptionRepository.save(subscription);
-        return MappingUtils.mapToSubscriptionModel(subscription);
+        return subscriptionModelMapper.build(subscription);
     }
 }

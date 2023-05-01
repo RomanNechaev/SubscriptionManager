@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "Subscriptions")
+@Table(name = "subscriptions")
 public class Subscription {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,10 +16,14 @@ public class Subscription {
     private Date paymentDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
-    public Subscription() {}
+
+    public Subscription() {
+    }
 
     public Subscription(String name, Double price, Date paymentDate, Category category, User user) {
         this.name = name;
@@ -28,6 +32,7 @@ public class Subscription {
         this.category = category;
         this.user = user;
     }
+
     public Long getId() {
         return id;
     }

@@ -19,27 +19,27 @@ public class SubscriptionController {
         this.subscriptionService = subscriptionService;
     }
 
-    @GetMapping(value = "/subscriptions")
+    @GetMapping(value = "/api/app/subscriptions")
     public ResponseEntity<List<SubscriptionModel>> getSubscriptionsByUsername() {
         return ResponseEntity.ok(subscriptionService.getSubscriptions());
     }
 
-    @GetMapping(value = "/subscription/{name}")
+    @GetMapping(value = "/api/app/subscription/{name}")
     public ResponseEntity<SubscriptionModel> getSubscriptionByName(@PathVariable String name) {
         return ResponseEntity.ok(subscriptionService.getSubscription(name));
     }
 
-    @PostMapping(value = "/subscription")
+    @PostMapping(value = "/api/app/subscription")
     public ResponseEntity<SubscriptionModel> create(@RequestBody CreateSubscriptionModel createSubscriptionModel) {
         return ResponseEntity.ok(subscriptionService.createSubscription(createSubscriptionModel));
     }
 
-    @PutMapping(value = "/subscription")
+    @PutMapping(value = "/api/app/subscription")
     public ResponseEntity<SubscriptionModel> update(@RequestBody UpdateSubscriptionModel updateSubscriptionModel) {
         return ResponseEntity.ok(subscriptionService.updateSubscription(updateSubscriptionModel));
     }
 
-    @DeleteMapping(value = "/subscription{id}")
+    @DeleteMapping(value = "/api/app/subscription{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         subscriptionService.deleteSubscription(id);
         return ResponseEntity.ok().build();
