@@ -9,7 +9,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import ru.matmex.subscription.services.UserService;
@@ -17,15 +16,12 @@ import ru.matmex.subscription.services.utils.JwtUtils;
 
 import java.io.IOException;
 
-@Component
 public class AuthTokenFilter extends OncePerRequestFilter {
-    private final JwtUtils jwtUtils;
-    private final UserService userService;
+    @Autowired
+    private  JwtUtils jwtUtils;
+    @Autowired
+    private  UserService userService;
 
-    public AuthTokenFilter(JwtUtils jwtUtils, UserService userService) {
-        this.jwtUtils = jwtUtils;
-        this.userService = userService;
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
