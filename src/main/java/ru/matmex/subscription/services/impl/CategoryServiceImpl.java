@@ -1,6 +1,7 @@
 package ru.matmex.subscription.services.impl;
 
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import ru.matmex.subscription.entities.Category;
 import ru.matmex.subscription.models.category.CategoryModel;
 import ru.matmex.subscription.models.category.CreateCategoryModel;
@@ -8,7 +9,7 @@ import ru.matmex.subscription.services.CategoryService;
 
 import java.util.List;
 
-@Component
+@Service
 public class CategoryServiceImpl implements CategoryService {
 
     @Override
@@ -17,7 +18,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryModel getCategory(String name) {
+    public Category getCategory(String name) {
         return null;
     }
 
