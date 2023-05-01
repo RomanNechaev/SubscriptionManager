@@ -1,5 +1,5 @@
 package ru.matmex.subscription.services;
 
-public class SubscriptionServiceImpl {
+public interface RegistrationService {
 
 }
