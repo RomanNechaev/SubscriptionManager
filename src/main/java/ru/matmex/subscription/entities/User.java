@@ -21,7 +21,7 @@ public class User {
         this.password = password;
         this.subscriptions = new ArrayList<>();
         this.categories = new ArrayList<>();
-//        roles.add(Role.USER);
+        roles.add(Role.USER);
     }
 
     @Id
@@ -40,10 +40,10 @@ public class User {
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
     private List<Category> categories;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    //@ManyToMany(fetch = FetchType.LAZY)
+    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(EnumType.STRING)
 
     private Set<Role> roles = new HashSet<>();
     public Long getId() {
