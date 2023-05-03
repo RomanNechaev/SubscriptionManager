@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import ru.matmex.subscription.entities.Category;
 import ru.matmex.subscription.models.category.CategoryModel;
 
+import java.util.Objects;
 import java.util.function.Function;
 
 @Component
@@ -14,6 +15,8 @@ public class CategoryModelMapper implements Function<Category, CategoryModel> {
         return new CategoryModel(category.getId(),
                 category.getName(),
                 category.getSubscriptions()
-        );
+                        .stream()
+                        .filter(x -> Objects.equals(x.getUser().getId(), category.getUser().getId()))
+                        .toList());
     }
 }
