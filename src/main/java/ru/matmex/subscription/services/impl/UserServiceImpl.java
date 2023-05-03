@@ -1,11 +1,9 @@
 package ru.matmex.subscription.services.impl;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -105,22 +103,21 @@ public class UserServiceImpl implements UserService {
         if (!userRepository.existsByUsername(username)) {
             throw new UsernameNotFoundException("User not found"); //TODO
         }
-        userRepository
-                .deleteUserByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found")); //TODO
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        userRepository.delete(user);
         return "Пользователь успешно удален!";
     }
 
     @Override
     public List<UserModel> getUsers() {
         return userRepository
-                .findAllByUsernameTrue()
-                .orElseThrow()//TODO
+                .findAll()
+                //TODO
                 .stream().map(userModelMapper).toList();
     }
 
     public void createAdminIfNotExists() {
-        User admin = new User("admin", "admin@mail.ru", passwordEncoder.encode("admin"));
+        User admin = new User("admin", "admin@mail.ru", passwordEncoder.encode("admin"), Role.ADMIN);
         admin.setRoles(Set.of(Role.ADMIN));
 
         if (!userRepository.existsByUsername("admin")) {

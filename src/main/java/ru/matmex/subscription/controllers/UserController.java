@@ -24,17 +24,18 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUsername(userUpdateModel));
     }
 
-    @GetMapping(value = "/api/app/admin/users")
+    @GetMapping(value = "/api/admin/app/users")
     public ResponseEntity<List<UserModel>> getUsers() {
         return ResponseEntity.ok(userService.getUsers());
     }
 
-    @GetMapping(value = "/api/app/admin/user/{username}")
+    @GetMapping(value = "/api/admin/app/{username}")
     public ResponseEntity<UserModel> getUserByUsername(@PathVariable String username) {
-        return ResponseEntity.ok(userService.getUser(username));
+        var t = userService.getUser(username);
+        return ResponseEntity.ok(t);
     }
 
-    @DeleteMapping(value = "/api/app/admin/user/{username}")
+    @DeleteMapping(value = "/api/admin/app/{username}")
     public ResponseEntity<String> delete(@PathVariable String username) {
         return ResponseEntity.ok(userService.delete(username));
     }

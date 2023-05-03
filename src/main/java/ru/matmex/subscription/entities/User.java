@@ -24,6 +24,15 @@ public class User {
         roles.add(Role.USER);
     }
 
+    public User(String username, String email, String password, Role role) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.subscriptions = new ArrayList<>();
+        this.categories = new ArrayList<>();
+        roles.add(role);
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,10 +43,10 @@ public class User {
 
     private String email;
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Subscription> subscriptions;
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Category> categories;
 
     //@ManyToMany(fetch = FetchType.LAZY)
@@ -46,6 +55,7 @@ public class User {
     @Enumerated(EnumType.STRING)
 
     private Set<Role> roles = new HashSet<>();
+
     public Long getId() {
         return id;
     }
@@ -65,6 +75,7 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+
     public String getEmail() {
         return email;
     }

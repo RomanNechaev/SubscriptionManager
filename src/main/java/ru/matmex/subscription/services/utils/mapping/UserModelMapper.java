@@ -23,8 +23,13 @@ public class UserModelMapper implements Function<User, UserModel> {
         return new UserModel(
                 user.getId(),
                 user.getUsername(),
-                user.getSubscriptions().stream().map(subscriptionModelMapper).toList(),
-                user.getCategories().stream().map(categoryModelMapper).toList());
+                user.getSubscriptions()
+                        .stream()
+                        .map(subscriptionModelMapper)
+                        .toList(),
+                user.getCategories()
+                        .stream()
+                        .map(categoryModelMapper).toList());
     }
 
     public UserModel build(User user) {

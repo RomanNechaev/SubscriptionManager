@@ -3,6 +3,7 @@ package ru.matmex.subscription.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -48,8 +49,8 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers("/auth/login").permitAll()
                 .requestMatchers("/registration").permitAll()
-                .requestMatchers("/api/app/**").permitAll()
-                .requestMatchers("/api/app/admin/**").hasRole("USER")
+                .requestMatchers("/api/app/**").hasRole("USER")
+                .requestMatchers(HttpMethod.DELETE,"/api/admin/app/**").hasRole("ADMIN")
                 .anyRequest().authenticated();
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
