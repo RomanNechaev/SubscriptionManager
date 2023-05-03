@@ -1,4 +1,4 @@
 package ru.matmex.subscription.models.category;
 
-public class UpdateCategoryModel {
+public record UpdateCategoryModel(Long id,String name) {
 }

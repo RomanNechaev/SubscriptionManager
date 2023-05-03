@@ -1,3 +1,3 @@
 package ru.matmex.subscription.models.subscription;
 
-public record UpdateSubscriptionModel(Long id, String paymentDate, String name, Double price, String category) {}
+public record UpdateSubscriptionModel(Long id, String name, String paymentDate, Double price, String category) {}
