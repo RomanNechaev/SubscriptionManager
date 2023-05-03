@@ -20,7 +20,7 @@ public class SubscriptionController {
     }
 
     @GetMapping(value = "/api/app/subscriptions")
-    public ResponseEntity<List<SubscriptionModel>> getSubscriptionsByUsername() {
+    public ResponseEntity<List<SubscriptionModel>> getSubscriptionsByCurrentUsername() {
         return ResponseEntity.ok(subscriptionService.getSubscriptions());
     }
 
@@ -39,9 +39,9 @@ public class SubscriptionController {
         return ResponseEntity.ok(subscriptionService.updateSubscription(updateSubscriptionModel));
     }
 
-    @DeleteMapping(value = "/api/app/subscription{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    @DeleteMapping(value = "/api/app/subscription/{id}")
+    public ResponseEntity<String> delete(@PathVariable Long id) {
         subscriptionService.deleteSubscription(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(subscriptionService.deleteSubscription(id));
     }
 }
