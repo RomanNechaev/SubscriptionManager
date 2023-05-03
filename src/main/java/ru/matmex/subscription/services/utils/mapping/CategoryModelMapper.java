@@ -8,8 +8,12 @@ import java.util.function.Function;
 
 @Component
 public class CategoryModelMapper implements Function<Category, CategoryModel> {
+
     @Override
     public CategoryModel apply(Category category) {
-        return null;
+        return new CategoryModel(category.getId(),
+                category.getName(),
+                category.getSubscriptions()
+        );
     }
 }
