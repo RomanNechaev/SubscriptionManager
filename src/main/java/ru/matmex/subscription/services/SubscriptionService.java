@@ -1,6 +1,5 @@
 package ru.matmex.subscription.services;
 
-import ru.matmex.subscription.entities.Subscription;
 import ru.matmex.subscription.models.subscription.CreateSubscriptionModel;
 import ru.matmex.subscription.models.subscription.SubscriptionModel;
 import ru.matmex.subscription.models.subscription.UpdateSubscriptionModel;
@@ -14,7 +13,7 @@ public interface SubscriptionService {
 
     SubscriptionModel createSubscription(CreateSubscriptionModel createSubscriptionModel);
 
-    void deleteSubscription(Long id);
+    String deleteSubscription(Long id);
 
     SubscriptionModel updateSubscription(UpdateSubscriptionModel updateSubscriptionModel);
 

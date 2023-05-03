@@ -1,10 +1,9 @@
 package ru.matmex.subscription.services.impl;
 
-import jakarta.persistence.Access;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import ru.matmex.subscription.entities.Category;
 import ru.matmex.subscription.entities.Subscription;
 import ru.matmex.subscription.entities.User;
 import ru.matmex.subscription.models.subscription.CreateSubscriptionModel;
@@ -38,24 +37,37 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public List<SubscriptionModel> getSubscriptions() {
-        return getSubscriptionsByUser(userService.getCurrentUser()).stream().map(subscriptionModelMapper).toList();
+        return getSubscriptionsByUser(userService.getCurrentUser())
+                .stream()
+                .map(subscriptionModelMapper)
+                .toList();
     }
 
     public List<Subscription> getSubscriptionsByUser(User user) {
-        return subscriptionRepository.findSubscriptionByUser(user).orElseThrow(EntityNotFoundException::new);
+        return subscriptionRepository
+                .findSubscriptionByUser(user)
+                .orElseThrow(EntityNotFoundException::new); //TODO
     }
 
     public SubscriptionModel getSubscription(String name) {
-        return getSubscriptions().stream().filter(sub -> Objects.equals(sub.name(), name)).findFirst().orElseThrow(EntityNotFoundException::new);
+        return getSubscriptions()
+                .stream()
+                .filter(sub -> Objects.equals(sub.name(), name))
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("нет подписки с таким названием!"));//TODO
     }
 
     @Override
     public SubscriptionModel createSubscription(CreateSubscriptionModel createSubscriptionModel) {
+        Category category;
+        if (createSubscriptionModel.category() == null) {
+            category = categoryService.getCategory("default"); //TODO
+        } else category = categoryService.getCategory(createSubscriptionModel.category());
         Subscription subscription = new Subscription(
                 createSubscriptionModel.name(),
                 createSubscriptionModel.price(),
                 Parser.parseToDate(createSubscriptionModel.paymentDate()),
-                categoryService.getCategory(createSubscriptionModel.category()),
+                category,
                 userService.getCurrentUser()
         );
         subscriptionRepository.save(subscription);
@@ -63,15 +75,20 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public void deleteSubscription(Long id) {
-        if (subscriptionRepository.existsById(id))
+    public String deleteSubscription(Long id) {
+        if (subscriptionRepository.existsById(id)) {
             subscriptionRepository.deleteById(id);
-        else throw new EntityNotFoundException();
+            return "Подписка успешна удалена!"; //TODO
+        } else {
+            throw new EntityNotFoundException("Нет такой подписки");//TODO
+        }
     }
 
     @Override
     public SubscriptionModel updateSubscription(UpdateSubscriptionModel updateSubscriptionModel) {
-        Subscription subscription = subscriptionRepository.findById(updateSubscriptionModel.id()).orElseThrow(EntityNotFoundException::new);
+        Subscription subscription = subscriptionRepository
+                .findById(updateSubscriptionModel.id())
+                .orElseThrow(EntityNotFoundException::new);
         subscription.setCategory(categoryService.getCategory(updateSubscriptionModel.category()));
         subscription.setName(updateSubscriptionModel.name());
         subscription.setPrice(updateSubscriptionModel.price());
