@@ -14,6 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import ru.matmex.subscription.config.jwt.AuthEntryPointJwt;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import ru.matmex.subscription.config.jwt.AuthTokenFilter;
+import ru.matmex.subscription.models.user.Role;
 
 @Configuration
 @EnableWebSecurity
@@ -48,6 +49,7 @@ public class WebSecurityConfig {
                 .requestMatchers("/auth/login").permitAll()
                 .requestMatchers("/registration").permitAll()
                 .requestMatchers("/api/app/**").permitAll()
+                .requestMatchers("/api/app/admin/**").hasRole("USER")
                 .anyRequest().authenticated();
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

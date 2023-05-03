@@ -5,6 +5,7 @@ import ru.matmex.subscription.models.subscription.SubscriptionModel;
 
 import java.util.List;
 
-public record UserModel(Long id, String username, List<SubscriptionModel> subscriptions,
+public record UserModel(Long id, String username,
+                        List<SubscriptionModel> subscriptions,
                         List<CategoryModel> categories) {
 }

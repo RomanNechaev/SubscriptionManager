@@ -1,9 +1,8 @@
 package ru.matmex.subscription.services.utils.mapping;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import ru.matmex.subscription.entities.User;
-import ru.matmex.subscription.models.subscription.SubscriptionModel;
 import ru.matmex.subscription.models.user.UserModel;
 
 import java.util.function.Function;
@@ -13,6 +12,7 @@ public class UserModelMapper implements Function<User, UserModel> {
     CategoryModelMapper categoryModelMapper;
     SubscriptionModelMapper subscriptionModelMapper;
 
+    @Autowired
     UserModelMapper(CategoryModelMapper categoryModelMapper, SubscriptionModelMapper subscriptionModelMapper) {
         this.categoryModelMapper = categoryModelMapper;
         this.subscriptionModelMapper = subscriptionModelMapper;
