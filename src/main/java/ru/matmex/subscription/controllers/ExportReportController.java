@@ -21,7 +21,7 @@ public class ExportReportController {
     /**
      * Экспорт отчета в формате .csv
      *
-     * @param name - текущий пользователь
+     * @param name - название отчета
      */
     @GetMapping(value = "/api/app/exportCSV/{name}")
     public ResponseEntity<Resource> exportCSV(@PathVariable String name) {
