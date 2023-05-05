@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
     UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserModelMapper userModelMapper;
-    private CategoryService categoryService;
+    private final CategoryService categoryService;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
@@ -80,7 +80,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserModel getUser(String username) {
-        return userModelMapper.build(userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found")));//TODO
+        return userModelMapper
+                .build(userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found")));
     }
 
     private List<? extends GrantedAuthority> mapRolesToAuthorities(Set<Role> roles) {
@@ -101,7 +102,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public String delete(String username) {
         if (!userRepository.existsByUsername(username)) {
-            throw new UsernameNotFoundException("User not found"); //TODO
+            throw new UsernameNotFoundException("User with" + username + " not found"); //TODO
         }
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         userRepository.delete(user);
@@ -112,7 +113,6 @@ public class UserServiceImpl implements UserService {
     public List<UserModel> getUsers() {
         return userRepository
                 .findAll()
-                //TODO
                 .stream().map(userModelMapper).toList();
     }
 
