@@ -68,7 +68,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserModel updateUsername(UserUpdateModel userUpdateModel) {
+    public UserModel updateUser(UserUpdateModel userUpdateModel) {
         User user = userRepository
                 .getById(userUpdateModel.id())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));

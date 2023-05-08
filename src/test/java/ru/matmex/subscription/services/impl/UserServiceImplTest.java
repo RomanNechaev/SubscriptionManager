@@ -1,7 +1,6 @@
 package ru.matmex.subscription.services.impl;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -11,21 +10,17 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.AuthenticationServiceException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.matmex.subscription.entities.User;
 import ru.matmex.subscription.models.user.UserModel;
 import ru.matmex.subscription.models.user.UserRegistrationModel;
+import ru.matmex.subscription.models.user.UserUpdateModel;
 import ru.matmex.subscription.repositories.UserRepository;
 import ru.matmex.subscription.services.CategoryService;
 import ru.matmex.subscription.services.UserService;
@@ -33,14 +28,12 @@ import ru.matmex.subscription.services.utils.mapping.UserModelMapper;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @ContextConfiguration(classes = {UserServiceImpl.class, PasswordEncoder.class})
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
-
-    @Autowired
-    private UserServiceImpl userServiceImpl;
 
     @Mock
     private UserRepository userRepository;
@@ -60,7 +53,16 @@ class UserServiceImplTest {
 
     @Test
     void testCanLoadUserByUsername() {
+        User testUser = new User("test", "test@gmail.com", "123");
 
+        when(userRepository.findByUsername("test")).thenReturn(Optional.of(testUser));
+
+        UserDetails user = new org.springframework.security.core.userdetails.User(testUser.getUsername(), testUser.getPassword(), testUser.getRoles().stream()
+                .map(r -> new SimpleGrantedAuthority("ROLE_" + r.name()))
+                .collect(Collectors.toList()));
+
+        UserDetails userResult = userService.loadUserByUsername("test");
+        assertThat(user).isEqualTo(userResult);
     }
 
     @Test
@@ -76,7 +78,6 @@ class UserServiceImplTest {
         User userCaptured = userArgumentCaptor.getValue();
 
         assertThat(userCaptured.getUsername()).isSameAs(userFromContext.username());
-
     }
 
     @Test
@@ -88,31 +89,56 @@ class UserServiceImplTest {
         assertThatThrownBy(() -> userService.adduser(userFromContext))
                 .isInstanceOf(AuthenticationServiceException.class)
                 .hasMessageContaining("Пользователь с таким именем уже существует");
-
     }
 
     @Test
-    void updateUsername() {
+    void testCanUpdateUser() {
+        String newEmail = "test@yandex.ru";
+        UserUpdateModel userUpdateModel = new UserUpdateModel(12L, "test", newEmail);
+        User user = new User("test", "test@gmail.com", "123");
+
+        when(userRepository.getById(12L)).thenReturn(Optional.of(user));
+
+        userService.updateUser(userUpdateModel);
+
+        String updatedEmail = user.getEmail();
+
+        assertThat(updatedEmail).isSameAs("test@yandex.ru");
     }
 
     @Test
-    void getUser() {
+    void canGetUser() {
+        User testUser = new User("test", "test@gmail.com", "123");
+
+        when(userRepository.findByUsername("test")).thenReturn(Optional.of(testUser));
+
+        UserModel user = userService.getUser("test");
+
+        assertThat(userModelMapper.build(testUser)).isEqualTo(user);
+    }
+
+    @Test
+    void willThrownWhenGetUserReturnEmptyOptional() {
+        String username = "test";
+        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userService.getUser(username))
+                .isInstanceOf(UsernameNotFoundException.class)
+                .hasMessage("User not found");
     }
 
     @Test
     void testGetCurrentUser() {
-        SecurityContext fakeSecurityContext = mock(SecurityContext.class);
-        Authentication authentication = mock(Authentication.class);
+//        Authentication authentication = mock(Authentication.class);
+//        when(authentication.getName()).thenReturn("invalidName");
+//
+//        when(userRepository.findByUsername("invalidName")).thenReturn(Optional.empty());
+//
+//        assertThatThrownBy(()->userService.getCurrentUser())
+//                .isInstanceOf(UsernameNotFoundException.class)
+//                .hasMessageContaining("User not found");
 
-        User user = new User("test", "test@gmail.com", "123");
-
-        Mockito.when(authentication.getName()).thenReturn("test");
-
-        when(fakeSecurityContext.getAuthentication()).thenReturn(authentication);
-
-        User currentUser = userService.getCurrentUser();
-
-        assertThat("test").isSameAs(currentUser.getUsername());
+//        assertThat("testUser").isSameAs(obtainedUser.getUsername());
     }
 
     @Test

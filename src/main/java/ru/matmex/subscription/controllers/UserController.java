@@ -21,7 +21,7 @@ public class UserController {
 
     @PostMapping(value = "/api/app/user")
     public ResponseEntity<UserModel> update(@RequestBody UserUpdateModel userUpdateModel) {
-        return ResponseEntity.ok(userService.updateUsername(userUpdateModel));
+        return ResponseEntity.ok(userService.updateUser(userUpdateModel));
     }
 
     @GetMapping(value = "/api/admin/app/users")
