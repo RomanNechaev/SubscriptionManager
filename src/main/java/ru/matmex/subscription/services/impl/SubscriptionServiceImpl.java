@@ -18,7 +18,7 @@ import ru.matmex.subscription.services.utils.mapping.SubscriptionModelMapper;
 
 import java.util.List;
 import java.util.Objects;
-
+import java.util.Optional;
 @Service
 public class SubscriptionServiceImpl implements SubscriptionService {
     SubscriptionRepository subscriptionRepository;
@@ -59,10 +59,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public SubscriptionModel createSubscription(CreateSubscriptionModel createSubscriptionModel) {
-        Category category;
-        if (createSubscriptionModel.category() == null) {
-            category = categoryService.getCategory("default"); //TODO
-        } else category = categoryService.getCategory(createSubscriptionModel.category());
+        Category category = Optional
+                .ofNullable(categoryService.getCategory(createSubscriptionModel.category()))
+                .orElse(categoryService.getCategory("default")
+        );
         Subscription subscription = new Subscription(
                 createSubscriptionModel.name(),
                 createSubscriptionModel.price(),
