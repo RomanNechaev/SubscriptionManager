@@ -25,6 +25,7 @@ import ru.matmex.subscription.repositories.UserRepository;
 import ru.matmex.subscription.services.CategoryService;
 import ru.matmex.subscription.services.UserService;
 import ru.matmex.subscription.services.utils.mapping.UserModelMapper;
+import ru.matmex.subscription.utils.UserBuilder;
 
 import java.util.List;
 import java.util.Optional;
@@ -46,18 +47,23 @@ class UserServiceImplTest {
 
     private UserService userService;
 
+    private final User defaultUser = UserBuilder.anUser().defaultUser();
+
     @BeforeEach
     void setUp() {
-        userService = new UserServiceImpl(userRepository, passwordEncoder, userModelMapper, categoryService);
+        userService = new UserServiceImpl(
+                userRepository,
+                passwordEncoder,
+                userModelMapper,
+                categoryService);
     }
 
     @Test
     void testCanLoadUserByUsername() {
-        User testUser = new User("test", "test@gmail.com", "123");
+        when(userRepository.findByUsername("test")).thenReturn(Optional.of(defaultUser));
 
-        when(userRepository.findByUsername("test")).thenReturn(Optional.of(testUser));
-
-        UserDetails user = new org.springframework.security.core.userdetails.User(testUser.getUsername(), testUser.getPassword(), testUser.getRoles().stream()
+        UserDetails user = new org.springframework.security.core.userdetails
+                .User(defaultUser.getUsername(), defaultUser.getPassword(), defaultUser.getRoles().stream()
                 .map(r -> new SimpleGrantedAuthority("ROLE_" + r.name()))
                 .collect(Collectors.toList()));
 
@@ -95,7 +101,8 @@ class UserServiceImplTest {
     void testCanUpdateUser() {
         String newEmail = "test@yandex.ru";
         UserUpdateModel userUpdateModel = new UserUpdateModel(12L, "test", newEmail);
-        User user = new User("test", "test@gmail.com", "123");
+        String oldEmail = "test@gmail.com";
+        User user = new User("test", oldEmail, "123");
 
         when(userRepository.getById(12L)).thenReturn(Optional.of(user));
 
@@ -108,18 +115,17 @@ class UserServiceImplTest {
 
     @Test
     void canGetUser() {
-        User testUser = new User("test", "test@gmail.com", "123");
 
-        when(userRepository.findByUsername("test")).thenReturn(Optional.of(testUser));
+        when(userRepository.findByUsername("test")).thenReturn(Optional.of(defaultUser));
 
         UserModel user = userService.getUser("test");
 
-        assertThat(userModelMapper.build(testUser)).isEqualTo(user);
+        assertThat(userModelMapper.build(defaultUser)).isEqualTo(user);
     }
 
     @Test
     void willThrownWhenGetUserReturnEmptyOptional() {
-        String username = "test";
+        String username = defaultUser.getUsername();
         when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> userService.getUser(username))
@@ -143,19 +149,18 @@ class UserServiceImplTest {
 
     @Test
     void testCanDeleteUser() {
-        String username = "test";
-        User user = new User(username, "test@gmail.com", "123");
+        String username = defaultUser.getUsername();
         given(userRepository.existsByUsername(username)).willReturn(true);
 
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(defaultUser));
         userService.delete(username);
 
-        verify(userRepository).delete(user);
+        verify(userRepository).delete(defaultUser);
     }
 
     @Test
     void testWillThrowWhenDeleteUserNotFound() {
-        String username = "test";
+        String username = defaultUser.getUsername();
         given(userRepository.existsByUsername(username)).willReturn(false);
 
         assertThatThrownBy(() -> userService.delete(username))
@@ -167,8 +172,13 @@ class UserServiceImplTest {
 
     @Test
     void testCanGetAllUsers() {
-        List<User> usersList = List.of(new User("test", "test@gmail.com", "123"),
-                new User("test2", "test2@mail.ru", "123"));
+        List<User> usersList = List
+                .of(defaultUser,
+                        UserBuilder.anUser()
+                                .withUsername("test2")
+                                .withEmail("test@gmail.com")
+                                .withPassword("123")
+                                .build());
 
         when(userRepository.findAll()).thenReturn(usersList);
 
@@ -177,9 +187,5 @@ class UserServiceImplTest {
         assertThat(usersList.size()).isEqualTo(allUsers.size());
 
         verify(userRepository).findAll();
-    }
-
-    @Test
-    void createAdminIfNotExists() {
     }
 }
