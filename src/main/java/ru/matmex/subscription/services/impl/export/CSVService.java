@@ -2,8 +2,11 @@ package ru.matmex.subscription.services.impl.export;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
+import ru.matmex.subscription.SubscriptionApplication;
 import ru.matmex.subscription.models.user.UserModel;
 import ru.matmex.subscription.services.ExportReportService;
 import ru.matmex.subscription.services.UserService;
@@ -17,6 +20,8 @@ import java.util.Map;
 
 public class CSVService implements ExportReportService {
     UserService userService;
+    private static final Logger logger = LoggerFactory.getLogger(CSVService.class);
+
     @Autowired
     public CSVService(UserService userService) {
         this.userService = userService;
@@ -46,7 +51,9 @@ public class CSVService implements ExportReportService {
             csvPrinter.flush();
             return new ByteArrayInputStream(out.toByteArray());
         } catch (IOException e) {
-            throw new RuntimeException("fail to import data to CSV file: " + e.getMessage());
+            logger.error(String.format("Не удалось создать .csv файл для экспорта отчетов у %s",
+                    userService.getCurrentUser()));
+            throw new RuntimeException(e.getMessage());
         }
     }
 }

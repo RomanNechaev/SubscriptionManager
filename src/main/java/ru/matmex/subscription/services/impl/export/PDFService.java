@@ -4,6 +4,8 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import ru.matmex.subscription.models.user.UserModel;
@@ -18,6 +20,7 @@ import java.util.Map;
 
 public class PDFService implements ExportReportService {
     UserService userService;
+    private static final Logger logger = LoggerFactory.getLogger(PDFService.class);
 
     @Autowired
     public PDFService(UserService userService) {
@@ -31,7 +34,10 @@ public class PDFService implements ExportReportService {
         ByteArrayInputStream in = reportToPDF(Report.valueOf(nameReport).calculate(user));
         return new InputStreamResource(in);
     }
-        /**Формирование отчета в pdf формате */
+
+    /**
+     * Формирование отчета в pdf формате
+     */
     private ByteArrayInputStream reportToPDF(Map<String, Double> report) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
@@ -51,6 +57,8 @@ public class PDFService implements ExportReportService {
             }
             doc.save(byteArrayOutputStream);
         } catch (IOException e) {
+            logger.error(String.format("Не удалось создать .pdf файл для экспорта отчетов у %s",
+                    userService.getCurrentUser()));
             e.printStackTrace();
         }
         return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
