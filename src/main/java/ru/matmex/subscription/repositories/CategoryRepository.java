@@ -15,4 +15,6 @@ public interface CategoryRepository extends CrudRepository<Category, Long> {
     Optional<List<Category>> findCategoriesByUser(User user);
 
     Optional<Category> findCategoryById(Long id);
+
+    boolean existsByName(String name);
 }

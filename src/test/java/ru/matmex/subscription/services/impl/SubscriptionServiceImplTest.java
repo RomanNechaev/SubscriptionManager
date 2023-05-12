@@ -58,15 +58,15 @@ class SubscriptionServiceImplTest {
     @Test
     void testCanGetSubscriptionsByUser() {
         User testUser = UserBuilder.anUser().defaultUser();
-        List<Subscription> subscriptionList = List
-                .of(defaultSubscription,
-                        SubscriptionBuilder.anSubscription()
-                                .withName("test2")
-                                .withCategory(CategoryBuilder.anCategory().defaultCategory())
-                                .withPrice(15.0)
-                                .withPaymentDate(Parser.parseToDate("12-03-2023"))
-                                .withUser(testUser)
-                                .build());
+        List<Subscription> subscriptionList = List.of(
+                defaultSubscription,
+                SubscriptionBuilder.anSubscription()
+                        .withName("test2")
+                        .withCategory(CategoryBuilder.anCategory().defaultCategory())
+                        .withPrice(15.0)
+                        .withPaymentDate(Parser.parseToDate("12-03-2023"))
+                        .withUser(testUser)
+                        .build());
 
         when(subscriptionRepository.findSubscriptionByUser(testUser)).thenReturn(Optional.of(subscriptionList));
         List<Subscription> subscriptions = subscriptionService.getSubscriptionsByUser(testUser);
