@@ -1,6 +1,5 @@
 package ru.matmex.subscription.services.impl;
 
-import jakarta.inject.Inject;
 import jakarta.persistence.EntityNotFoundException;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -9,14 +8,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import ru.matmex.subscription.entities.Subscription;
 import ru.matmex.subscription.entities.User;
 import ru.matmex.subscription.models.subscription.CreateSubscriptionModel;
 import ru.matmex.subscription.models.subscription.SubscriptionModel;
 import ru.matmex.subscription.models.subscription.UpdateSubscriptionModel;
-import ru.matmex.subscription.repositories.CategoryRepository;
 import ru.matmex.subscription.repositories.SubscriptionRepository;
 import ru.matmex.subscription.services.CategoryService;
 import ru.matmex.subscription.services.SubscriptionService;
@@ -34,14 +31,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ContextConfiguration(classes = {SubscriptionServiceImpl.class})
 @ExtendWith(MockitoExtension.class)
 class SubscriptionServiceImplTest {
-    @Autowired
-    private SubscriptionServiceImpl subscriptionServiceImpl;
     @Mock
     private SubscriptionRepository subscriptionRepository;
     @Mock
