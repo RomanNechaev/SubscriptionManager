@@ -9,15 +9,25 @@ import ru.matmex.subscription.models.security.AuthRequest;
 import ru.matmex.subscription.models.security.AuthResponse;
 import ru.matmex.subscription.services.AuthenticationService;
 
+/**
+ * Контроллер для авторизации пользователя
+ */
 @Controller
 @CrossOrigin
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
+
     @Autowired
     public AuthenticationController(AuthenticationService authenticationService) {
 
         this.authenticationService = authenticationService;
     }
+
+    /**
+     * Авторизация пользователя
+     * @param authRequest - данные о пользователи
+     * @return HTTP ответ об авторизации
+     */
     @PostMapping("auth/login")
     public ResponseEntity<AuthResponse> authUser(@RequestBody AuthRequest authRequest) {
         return ResponseEntity.ok(authenticationService.authUser(authRequest));

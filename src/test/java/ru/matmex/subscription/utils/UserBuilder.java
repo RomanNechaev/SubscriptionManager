@@ -7,7 +7,9 @@ import ru.matmex.subscription.entities.User;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * Создание объекта пользователя
+ */
 public class UserBuilder {
     private String username;
 

@@ -58,6 +58,9 @@ class UserServiceImplTest {
                 categoryService);
     }
 
+    /**
+     * Тестирование авторизации пользователя
+     */
     @Test
     void testCanLoadUserByUsername() {
         when(userRepository.findByUsername("test")).thenReturn(Optional.of(defaultUser));
@@ -71,6 +74,9 @@ class UserServiceImplTest {
         assertThat(user).isEqualTo(userResult);
     }
 
+    /**
+     * Тестирование добавления пользователя
+     */
     @Test
     void testCanAddUser() {
         UserRegistrationModel userFromContext = new UserRegistrationModel("Test", "test@gmail.com", "123456");
@@ -86,6 +92,9 @@ class UserServiceImplTest {
         assertThat(userCaptured.getUsername()).isSameAs(userFromContext.username());
     }
 
+    /**
+     * Тестирование добавления пользователя, если никнейм уже занят
+     */
     @Test
     void testWillThrowWhenUsernameIsTaken() {
         UserRegistrationModel userFromContext = new UserRegistrationModel("Test", "test@gmail.com", "123456");
@@ -97,6 +106,9 @@ class UserServiceImplTest {
                 .hasMessageContaining("Пользователь с таким именем уже существует");
     }
 
+    /**
+     * Тестирование обновления пользователя
+     */
     @Test
     void testCanUpdateUser() {
         String newEmail = "test@yandex.ru";
@@ -113,6 +125,9 @@ class UserServiceImplTest {
         assertThat(updatedEmail).isSameAs("test@yandex.ru");
     }
 
+    /**
+     * Тестирование получения пользователя
+     */
     @Test
     void canGetUser() {
 
@@ -123,6 +138,9 @@ class UserServiceImplTest {
         assertThat(userModelMapper.build(defaultUser)).isEqualTo(user);
     }
 
+    /**
+     * Тестирование получения несуществующего пользователя
+     */
     @Test
     void willThrownWhenGetUserReturnEmptyOptional() {
         String username = defaultUser.getUsername();
@@ -133,6 +151,9 @@ class UserServiceImplTest {
                 .hasMessage("User not found");
     }
 
+    /**
+     * Тестирование получения текущего пользователя
+     */
     @Test
     void testGetCurrentUser() {
 //        Authentication authentication = mock(Authentication.class);
@@ -147,6 +168,9 @@ class UserServiceImplTest {
 //        assertThat("testUser").isSameAs(obtainedUser.getUsername());
     }
 
+    /**
+     * Тестирование удаления пользователя
+     */
     @Test
     void testCanDeleteUser() {
         String username = defaultUser.getUsername();
@@ -158,6 +182,9 @@ class UserServiceImplTest {
         verify(userRepository).delete(defaultUser);
     }
 
+    /**
+     * Тестирование удаления несуществущего пользователя
+     */
     @Test
     void testWillThrowWhenDeleteUserNotFound() {
         String username = defaultUser.getUsername();
@@ -170,6 +197,9 @@ class UserServiceImplTest {
 
     }
 
+    /**
+     * Тестирование на получения всех пользователей
+     */
     @Test
     void testCanGetAllUsers() {
         List<User> usersList = List

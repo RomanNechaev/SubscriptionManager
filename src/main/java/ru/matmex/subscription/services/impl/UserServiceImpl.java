@@ -25,6 +25,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Реализация сервиса для операций с пользователем
+ */
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -42,10 +45,15 @@ public class UserServiceImpl implements UserService {
         this.passwordEncoder = passwordEncoder;
         this.userModelMapper = userModelMapper;
         this.categoryService = categoryService;
-        createAdminIfNotExists();
+        createAdmin();
     }
 
-
+    /**
+     * Загрузить пользователя по имени
+     * @param username - имя пользователя
+     * @return авторизовачная информация о пользователе
+     * @throws UsernameNotFoundException
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository
@@ -54,6 +62,11 @@ public class UserServiceImpl implements UserService {
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), mapRolesToAuthorities(user.getRoles()));
     }
 
+    /**
+     * Добавить пользователя
+     * @param userRegistrationModel - регистрационные данные пользователя
+     * @return информация о зарегистрированном пользователе
+     */
     @Override
     public UserModel adduser(UserRegistrationModel userRegistrationModel) {
         if (userRepository.existsByUsername(userRegistrationModel.username())) {
@@ -67,6 +80,11 @@ public class UserServiceImpl implements UserService {
         return userModelMapper.build(user);
     }
 
+    /**
+     * Обновить пользователя
+     * @param userUpdateModel - обновленная информация о пользователе
+     * @return информация об обновленном пользователе
+     */
     @Override
     public UserModel updateUser(UserUpdateModel userUpdateModel) {
         User user = userRepository
@@ -78,12 +96,22 @@ public class UserServiceImpl implements UserService {
         return userModelMapper.build(user);
     }
 
+    /**
+     * Получить пользователя по имени
+     * @param username - имя пользователя
+     * @return информация о пользователе
+     */
     @Override
     public UserModel getUser(String username) {
         return userModelMapper
                 .build(userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found")));
     }
 
+    /**
+     * Преобразовать роль к авторизационной роли spring-security
+     * @param roles список ролей
+     * @return список авторизационных ролей
+     */
     private List<? extends GrantedAuthority> mapRolesToAuthorities(Set<Role> roles) {
         return roles
                 .stream()
@@ -91,6 +119,10 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Получить пользователя в текущей сессии
+     * @return сущность пользователя
+     */
     @Override
     public User getCurrentUser() {
         Authentication user = SecurityContextHolder.getContext().getAuthentication();
@@ -99,6 +131,11 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found")); //TODO
     }
 
+    /**
+     * Удалить пользователя
+     * @param username имя пользователя
+     * @return информация об удалении
+     */
     @Override
     public String delete(String username) {
         if (!userRepository.existsByUsername(username)) {
@@ -109,6 +146,10 @@ public class UserServiceImpl implements UserService {
         return "Пользователь успешно удален!";
     }
 
+    /**
+     * Получить всех пользователей
+     * @return список всех пользователей
+     */
     @Override
     public List<UserModel> getUsers() {
         return userRepository
@@ -116,7 +157,10 @@ public class UserServiceImpl implements UserService {
                 .stream().map(userModelMapper).toList();
     }
 
-    public void createAdminIfNotExists() {
+    /**
+     * Создать администратора
+     */
+    public void createAdmin() {
         User admin = new User("admin", "admin@mail.ru", passwordEncoder.encode("admin"), Role.ADMIN);
         admin.setRoles(Set.of(Role.ADMIN));
 

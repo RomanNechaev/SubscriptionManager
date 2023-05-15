@@ -7,6 +7,9 @@ import ru.matmex.subscription.models.user.UserModel;
 
 import java.util.function.Function;
 
+/**
+ * Преобразование сущности пользователя в DTO
+ */
 @Component
 public class UserModelMapper implements Function<User, UserModel> {
     CategoryModelMapper categoryModelMapper;

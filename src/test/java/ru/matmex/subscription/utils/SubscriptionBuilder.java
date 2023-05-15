@@ -5,7 +5,9 @@ import ru.matmex.subscription.entities.Subscription;
 import ru.matmex.subscription.entities.User;
 
 import java.util.Date;
-
+/**
+ * Создание объекта подписки
+ */
 public class SubscriptionBuilder {
     private String name;
     private Double price;

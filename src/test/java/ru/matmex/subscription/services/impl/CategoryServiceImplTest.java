@@ -1,6 +1,5 @@
 package ru.matmex.subscription.services.impl;
 
-import jakarta.inject.Singleton;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,7 +9,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.InstanceOfAssertFactories.COLLECTION;
 import static org.mockito.Mockito.*;
 
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -35,8 +33,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
-
 @ContextConfiguration(classes = {CategoryServiceImpl.class})
 @ExtendWith(MockitoExtension.class)
 class CategoryServiceImplTest {
@@ -59,6 +55,9 @@ class CategoryServiceImplTest {
                 subscriptionService);
     }
 
+    /**
+     * Тестирование получения категорий текущего пользователя пользователя
+     */
     @Test
     void testCanGetCategoriesByCurrentUsername() {
         User testUser = UserBuilder.anUser().defaultUser();
@@ -82,6 +81,9 @@ class CategoryServiceImplTest {
         verify(categoryRepository).findCategoriesByUser(testUser);
     }
 
+    /**
+     * Тестирование получения категорий пользователя
+     */
     @Test
     void testCanGetCategoryByName() {
         String categoryName = "test";
@@ -96,6 +98,9 @@ class CategoryServiceImplTest {
         verify(categoryRepository).findCategoryByName(categoryName);
     }
 
+    /**
+     * Тестирование создания категории
+     */
     @Test
     void testCanCreateCategory() {
         CreateCategoryModel createCategoryModel = new CreateCategoryModel("test");
@@ -112,6 +117,9 @@ class CategoryServiceImplTest {
 
     }
 
+    /**
+     * Тестирвоание создание категории по умолчанию
+     */
     @Test
     void testCanCreateDefaultCategory() {
         User testUser = UserBuilder.anUser().defaultUser();
@@ -127,6 +135,9 @@ class CategoryServiceImplTest {
 
     }
 
+    /**
+     * Тестирование создания категории, если она уже существует
+     */
     @Test
     void testWillThrowWhenCreateCategoryExists() {
         CreateCategoryModel createCategoryModel = new CreateCategoryModel("test");
@@ -139,6 +150,9 @@ class CategoryServiceImplTest {
         verify(categoryRepository, never()).save(any());
     }
 
+    /**
+     * Тестирование обновления категории
+     */
     @Test
     void testCanUpdateCategory() {
         String newName = "sport";
@@ -161,6 +175,9 @@ class CategoryServiceImplTest {
         assertThat(updatedName).isSameAs(newName);
     }
 
+    /**
+     * Тестирование удаления категории
+     */
     @Test
     void testCanDeleteCategory() {
         Long categoryId = 12L;
@@ -172,6 +189,9 @@ class CategoryServiceImplTest {
 
     }
 
+    /**
+     * Тестирование удаления несуществующей категории
+     */
     @Test
     void testWillThrownWhenDeleteCategoryNotFound() {
         Long categoryId = 12L;
@@ -181,6 +201,9 @@ class CategoryServiceImplTest {
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
+    /**
+     * Тестирование преобразования сущности категории в DTO
+     */
     @Test
     void testCanMapToCategoryModel() {
         Category category = CategoryBuilder.anCategory().defaultCategory();

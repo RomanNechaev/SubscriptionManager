@@ -7,6 +7,9 @@ import ru.matmex.subscription.entities.User;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Создание объекта сущность
+ */
 public class CategoryBuilder {
 
     private String name;

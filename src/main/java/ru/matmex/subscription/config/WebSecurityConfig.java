@@ -12,34 +12,53 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import ru.matmex.subscription.config.jwt.AuthEntryPointJwt;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import ru.matmex.subscription.config.jwt.AuthEntryPointJwt;
 import ru.matmex.subscription.config.jwt.AuthTokenFilter;
-import ru.matmex.subscription.models.user.Role;
 
+/**
+ * Настройки безопасности приложения
+ */
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
 
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
-
+    /**
+     * Получить декодировщик пароля
+     * @return декодировщик пароля
+     */
     @Bean
     public PasswordEncoder getPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Получить фильтр для аутентификации и валидации пользователя с помощью JWT
+     * @return
+     */
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
         return new AuthTokenFilter();
     }
 
+    /**
+     * получить менеджер управления аутентификацией
+     * @param authenticationConfiguration - конфигурация аутентификации
+     * @return менеджер аутентификации
+     * @throws Exception
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
-
-
+    /**
+     * Обработать цепочку фильтров
+     * @param http тело http пакета
+     * @return сконфигурированный http ответ
+     * @throws Exception
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.

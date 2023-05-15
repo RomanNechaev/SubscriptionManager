@@ -12,9 +12,20 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+/**
+ * Обработчик точки входа аутинфикации в приложение
+ */
 @Component
 public class AuthEntryPointJwt implements AuthenticationEntryPoint {
-
+    /**
+     * Записать ответ о том, что аутентификация не удалась
+     *
+     * @param request       запрос на аутентификацию
+     * @param response      ответ
+     * @param authException ошибка аутентификации
+     * @throws IOException
+     */
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authException) throws IOException {

@@ -9,6 +9,9 @@ import java.util.Set;
 
 import ru.matmex.subscription.models.user.Role;
 
+/**
+ * Сущность пользователя
+ */
 @Entity
 @Table(name = "users")
 public class User {

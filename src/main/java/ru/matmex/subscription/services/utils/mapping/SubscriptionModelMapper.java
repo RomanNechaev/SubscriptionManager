@@ -6,6 +6,9 @@ import ru.matmex.subscription.entities.Subscription;
 import ru.matmex.subscription.models.subscription.SubscriptionModel;
 
 import java.util.function.Function;
+/**
+ * Преобразование сущности подписки в DTO
+ */
 @Component
 public class SubscriptionModelMapper implements Function<Subscription, SubscriptionModel> {
     @Override

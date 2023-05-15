@@ -1,11 +1,11 @@
 package ru.matmex.subscription.services.impl;
 
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import ru.matmex.subscription.entities.Category;
-import ru.matmex.subscription.entities.Subscription;
 import ru.matmex.subscription.entities.User;
 import ru.matmex.subscription.models.category.CategoryModel;
 import ru.matmex.subscription.models.category.CreateCategoryModel;
@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Реализация сервиса для операций с категориями
+ */
 @Service
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
@@ -39,6 +42,10 @@ public class CategoryServiceImpl implements CategoryService {
         this.subscriptionService = subscriptionService;
     }
 
+    /**
+        Получить категорию текущего юзера
+        @return Список категорий текущего пользователя
+     */
     @Override
     public List<CategoryModel> getCategoriesByCurrentUsername() {
         return categoryRepository
@@ -48,41 +55,73 @@ public class CategoryServiceImpl implements CategoryService {
                 .toList();
     }
 
+    /**
+     * Получить категорию по имени
+     * @param name Имя категории
+     * @return категория с именем name
+     */
     @Override
     public Category getCategory(String name) {
-        return categoryRepository.findCategoryByName(name).orElseThrow(EntityNotFoundException::new);
+        return categoryRepository
+                .findCategoryByName(name)
+                .orElseThrow(EntityNotFoundException::new);
     }
 
+    /**
+     * Преобразовать сущность категории в модель категории
+     * @param name имя категори
+     * @return модель категории
+     */
     @Override
     public CategoryModel getCategoryToClient(String name) {
         return categoryModelMapper.apply(getCategory(name));
     }
 
-    public List<Subscription> getCategoryByUser(User user) {
-        return null;
-    }
-
+    /**
+     * Создать категорию
+     * @param createCategoryModel - данные, заполненные пользователем при создании категории на клиенте
+     * @return модель категории
+     */
     @Override
     public CategoryModel create(CreateCategoryModel createCategoryModel) {
+        if (categoryRepository.existsByName(createCategoryModel.name())) {
+            throw new EntityExistsException("Сущность с именем" + createCategoryModel.name() + "уже существует");
+        }
         Category category = new Category(createCategoryModel.name(), new ArrayList<>(), userService.getCurrentUser());
         categoryRepository.save(category);
         return categoryModelMapper.apply(category);
     }
 
+    /**
+     * Создать категорию по умолчанию
+     * @param user - Сущность юзера
+     */
     @Override
     public void createDefaultSubscription(User user) {
         Category category = new Category("default", new ArrayList<>(), user);
         categoryRepository.save(category);
     }
 
+    /**
+     * Обновить категорию
+     * @param updateCategoryModel параметры, заполненные пользователем на клиенте
+     * @return модель категории
+     */
     @Override
     public CategoryModel update(UpdateCategoryModel updateCategoryModel) {
-        Category category = categoryRepository.findCategoryById(updateCategoryModel.id()).orElseThrow(EntityNotFoundException::new);//TODO
+        Category category = categoryRepository
+                .findCategoryById(updateCategoryModel.id())
+                .orElseThrow(EntityNotFoundException::new);//TODO
         category.setName(updateCategoryModel.name());
         categoryRepository.save(category);
         return categoryModelMapper.apply(category);
     }
 
+    /**
+     * Удалить категорию
+     * @param id - индетификатор категории в БД
+     * @return Сообщение об успешном удалении, в случае если не произошла ошибка
+     */
     @Override
     public String delete(Long id) {
         if (categoryRepository.existsById(id)) {

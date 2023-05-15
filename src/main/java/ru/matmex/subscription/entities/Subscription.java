@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 
 import java.util.Date;
 
+/**
+ * Сущность подписки
+ */
 @Entity
 @Table(name = "subscriptions")
 public class Subscription {

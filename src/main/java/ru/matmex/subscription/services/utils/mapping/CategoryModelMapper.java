@@ -7,6 +7,9 @@ import ru.matmex.subscription.models.category.CategoryModel;
 import java.util.Objects;
 import java.util.function.Function;
 
+/**
+ * Преобразование сущности категории в DTO
+ */
 @Component
 public class CategoryModelMapper implements Function<Category, CategoryModel> {
 

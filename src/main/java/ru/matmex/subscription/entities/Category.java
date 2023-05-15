@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 
 import java.util.List;
 
+/**
+ * Сущность категории
+ */
 @Entity
 @Table(name = "categories")
 public class Category {
@@ -39,10 +42,6 @@ public class Category {
 
     public List<Subscription> getSubscriptions() {
         return subscriptions;
-    }
-
-    public void setSubscriptions(List<Subscription> subscriptions) {
-        this.subscriptions = subscriptions;
     }
 
     public Long getId() {

@@ -19,6 +19,9 @@ import ru.matmex.subscription.services.utils.mapping.SubscriptionModelMapper;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+/**
+ * Реализация сервиса для операций с подписками
+ */
 @Service
 public class SubscriptionServiceImpl implements SubscriptionService {
     SubscriptionRepository subscriptionRepository;
@@ -35,6 +38,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         this.userService = userService;
     }
 
+    /**
+     * Получить спиоск всех подписок текущего пользователя
+     * @return список всех подписок текущего пользователя
+     */
     @Override
     public List<SubscriptionModel> getSubscriptions() {
         return getSubscriptionsByUser(userService.getCurrentUser())
@@ -43,12 +50,22 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 .toList();
     }
 
+    /**
+     * Получить список подписок определенного пользователя
+     * @param user - сущность пользователя
+     * @return список подписок
+     */
     public List<Subscription> getSubscriptionsByUser(User user) {
         return subscriptionRepository
                 .findSubscriptionByUser(user)
                 .orElseThrow(EntityNotFoundException::new); //TODO
     }
 
+    /**
+     * Получить подписку
+     * @param name имя подписки
+     * @return модель подписки
+     */
     public SubscriptionModel getSubscription(String name) {
         return getSubscriptions()
                 .stream()
@@ -57,6 +74,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 .orElseThrow(() -> new EntityNotFoundException("нет подписки с таким названием!"));//TODO
     }
 
+    /**
+     * Создать подписку
+     * @param createSubscriptionModel данные, заполненные пользователем при создании подписки на клиенте
+     * @return модель подписки
+     */
     @Override
     public SubscriptionModel createSubscription(CreateSubscriptionModel createSubscriptionModel) {
         Category category = Optional
@@ -74,6 +96,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return subscriptionModelMapper.build(subscription);
     }
 
+    /**
+     * Удалить подписку
+     * @param id - индефикатор подписки в БД
+     * @return сообщение об успешном удалении
+     */
     @Override
     public String deleteSubscription(Long id) {
         if (subscriptionRepository.existsById(id)) {
@@ -84,6 +111,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         }
     }
 
+    /**
+     * Обновить подписку
+     * @param updateSubscriptionModel - параметры, заполненные пользователем на клиенте
+     * @return модель подписки
+     */
     @Override
     public SubscriptionModel updateSubscription(UpdateSubscriptionModel updateSubscriptionModel) {
         Subscription subscription = subscriptionRepository

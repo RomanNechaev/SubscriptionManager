@@ -23,6 +23,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         this.jwtUtils = jwtUtils;
     }
 
+    /**
+     * Авторизация пользователя
+     * @param authRequest авторазационные данные пользователя
+     * @return ответ, содержащий необходимую авторизационную информацию
+     */
     @Override
     public AuthResponse authUser(AuthRequest authRequest) {
         checkOnNull(authRequest);
@@ -30,16 +35,24 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        //TODO добавить роли
         return new AuthResponse(userDetails.getUsername(), jwt);
     }
 
+    /**
+     * Проверить что авторизационные аргументы не null
+     * @param authRequest авторазационные данные пользователя
+     */
     private void checkOnNull(AuthRequest authRequest) {
         if (authRequest.username() == null || authRequest.username().equals("") || authRequest.password() == null || authRequest.password().equals("")) {
             throw new IllegalArgumentException("Аргументы для входа не могут быть пустыми!");
         }
     }
 
+    /**
+     * Получить аутенфикацию пользователя
+     * @param authRequest авторазационные данные пользователя
+     * @return пользователя (Principal) с точки зрения Spring Security.
+     */
     private Authentication getAuthentication(AuthRequest authRequest) {
         return authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(

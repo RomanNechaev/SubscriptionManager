@@ -8,6 +8,9 @@ import ru.matmex.subscription.models.user.UserModel;
 import ru.matmex.subscription.models.user.UserRegistrationModel;
 import ru.matmex.subscription.services.UserService;
 
+/**
+ * Контроллер для регистрации пользователя
+ */
 @Controller
 @CrossOrigin
 public class RegistrationController {
@@ -17,6 +20,12 @@ public class RegistrationController {
     public RegistrationController(UserService userService) {
         this.userService = userService;
     }
+
+    /**
+     * Регистрация пользователя в приложении
+     * @param userRegistrationModel - данные о пользователе
+     * @return HTTP ответ с данными о пользователе
+     */
     @PostMapping("/registration")
     public ResponseEntity<UserModel> registration(@RequestBody UserRegistrationModel userRegistrationModel) {
         return ResponseEntity.ok(userService.adduser(userRegistrationModel));

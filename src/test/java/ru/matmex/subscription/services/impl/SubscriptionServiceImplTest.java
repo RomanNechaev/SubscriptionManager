@@ -55,6 +55,9 @@ class SubscriptionServiceImplTest {
                 userService);
     }
 
+    /**
+     * Тестирование получения всех подписок подписок определенного пользователя
+     */
     @Test
     void testCanGetSubscriptionsByUser() {
         User testUser = UserBuilder.anUser().defaultUser();
@@ -77,6 +80,9 @@ class SubscriptionServiceImplTest {
 
     }
 
+    /**
+     * Тестирования получения всех подписок текузего пользователя
+     */
     @Test
     void testCanGetAllSubscriptions() {
         User testUser = UserBuilder.anUser().defaultUser();
@@ -97,6 +103,9 @@ class SubscriptionServiceImplTest {
         assertThat(subscriptionList.stream().map(subscriptionModelMapper).toList()).isEqualTo(subscriptionModelList);
     }
 
+    /**
+     * Тестирование получения подписки по названию
+     */
     @Test
     void testCanGetSubscriptionByName() {
         User testUser = UserBuilder.anUser().defaultUser();
@@ -118,6 +127,9 @@ class SubscriptionServiceImplTest {
         assertThat(defaultSubscription.getName()).isEqualTo(actualSubscription.name());
     }
 
+    /**
+     * Тестирование создания подписки
+     */
     @Test
     void testCanCreateSubscription() {
         CreateSubscriptionModel createSubscriptionModel = new CreateSubscriptionModel("test", "12-03-2013", 123.0, "Test");
@@ -133,6 +145,9 @@ class SubscriptionServiceImplTest {
         assertThat(subscription.getName()).isSameAs(createSubscriptionModel.name());
     }
 
+    /**
+     * Тестирование удаления подписки
+     */
     @Test
     void testCanDeleteSubscription() {
         Long subscriptionId = 12L;
@@ -143,6 +158,9 @@ class SubscriptionServiceImplTest {
         verify(subscriptionRepository).deleteById(subscriptionId);
     }
 
+    /**
+     * Тестирование удаления несуществующей подпсики
+     */
     @Test
     void testWillThrowWhenDeleteSubscriptionNotFound() {
         Long subscriptionId = 12L;
@@ -156,6 +174,9 @@ class SubscriptionServiceImplTest {
 
     }
 
+    /**
+     * Тестирование обновления подписки
+     */
     @Test
     void testCanUpdateSubscription() {
         String newName = "spotify";
