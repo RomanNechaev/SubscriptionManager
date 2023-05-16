@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import ru.matmex.subscription.services.ExportReportService;
 import ru.matmex.subscription.services.impl.export.CSVService;
 import ru.matmex.subscription.services.impl.export.JSONService;
 import ru.matmex.subscription.services.impl.export.PDFService;
@@ -16,9 +17,9 @@ import java.util.Map;
 
 @Controller
 public class ExportReportController {
-    CSVService csvService;
+    ExportReportService csvService;
     JSONService jsonService;
-    PDFService pdfService;
+    ExportReportService pdfService;
 
     @Autowired
     public ExportReportController(CSVService csvService, JSONService jsonService, PDFService pdfService) {
@@ -43,14 +44,17 @@ public class ExportReportController {
 
     /**
      * Экспорт отчета в формате JSON
+     *
      * @param name - название отчета
      */
     @GetMapping(value = "/api/app/exportJSON/{name}")
     public ResponseEntity<Map<String, Double>> exportJSON(@PathVariable String name) {
         return ResponseEntity.ok(jsonService.loadReport(name));
     }
+
     /**
      * Экспорт отчета в формате PDF
+     *
      * @param name - название отчета
      */
     @GetMapping(value = "/api/app/exportPDF/{name}")
