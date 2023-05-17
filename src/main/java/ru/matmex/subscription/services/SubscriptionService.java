@@ -12,6 +12,7 @@ public interface SubscriptionService {
     List<SubscriptionModel> getSubscriptions();
 
     SubscriptionModel getSubscription(String name);
+
     List<Subscription> getSubscriptionsByUser(User user);
 
     SubscriptionModel createSubscription(CreateSubscriptionModel createSubscriptionModel);

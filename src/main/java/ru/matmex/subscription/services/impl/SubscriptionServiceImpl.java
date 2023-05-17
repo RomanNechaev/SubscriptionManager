@@ -9,37 +9,46 @@ import ru.matmex.subscription.entities.User;
 import ru.matmex.subscription.models.subscription.CreateSubscriptionModel;
 import ru.matmex.subscription.models.subscription.SubscriptionModel;
 import ru.matmex.subscription.models.subscription.UpdateSubscriptionModel;
+import ru.matmex.subscription.repositories.CategoryRepository;
 import ru.matmex.subscription.repositories.SubscriptionRepository;
+import ru.matmex.subscription.repositories.UserRepository;
 import ru.matmex.subscription.services.CategoryService;
 import ru.matmex.subscription.services.SubscriptionService;
 import ru.matmex.subscription.services.UserService;
 import ru.matmex.subscription.services.utils.Parser;
 import ru.matmex.subscription.services.utils.mapping.SubscriptionModelMapper;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 /**
  * Реализация сервиса для операций с подписками
  */
 @Service
 public class SubscriptionServiceImpl implements SubscriptionService {
-    SubscriptionRepository subscriptionRepository;
-    CategoryService categoryService;
-    UserService userService;
-    SubscriptionModelMapper subscriptionModelMapper;
+    private final SubscriptionRepository subscriptionRepository;
+    private final CategoryService categoryService;
+    private final UserService userService;
+    private final SubscriptionModelMapper subscriptionModelMapper;
+    private final CategoryRepository categoryRepository;
 
     @Autowired
     public SubscriptionServiceImpl(SubscriptionRepository subscriptionRepository, SubscriptionModelMapper subscriptionModelMapper,
-                                   CategoryService categoryService, UserService userService) {
+                                   CategoryService categoryService, UserService userService,
+                                   CategoryRepository categoryRepository) {
         this.subscriptionRepository = subscriptionRepository;
         this.subscriptionModelMapper = subscriptionModelMapper;
         this.categoryService = categoryService;
         this.userService = userService;
+        this.categoryRepository = categoryRepository;
     }
 
     /**
      * Получить спиоск всех подписок текущего пользователя
+     *
      * @return список всех подписок текущего пользователя
      */
     @Override
@@ -52,17 +61,23 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     /**
      * Получить список подписок определенного пользователя
+     *
      * @param user - сущность пользователя
      * @return список подписок
      */
     public List<Subscription> getSubscriptionsByUser(User user) {
-        return subscriptionRepository
-                .findSubscriptionByUser(user)
-                .orElseThrow(EntityNotFoundException::new); //TODO
+        return categoryRepository
+                .findCategoriesByUser(user)
+                .orElseThrow(EntityNotFoundException::new)
+                .stream().map(Category::getSubscriptions)
+                .flatMap(Collection::stream)
+                .toList();
+
     }
 
     /**
      * Получить подписку
+     *
      * @param name имя подписки
      * @return модель подписки
      */
@@ -71,20 +86,18 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 .stream()
                 .filter(sub -> Objects.equals(sub.name(), name))
                 .findFirst()
-                .orElseThrow(() -> new EntityNotFoundException("нет подписки с таким названием!"));//TODO
+                .orElseThrow(() -> new EntityNotFoundException("нет подписки с таким названием!"));
     }
 
     /**
      * Создать подписку
+     *
      * @param createSubscriptionModel данные, заполненные пользователем при создании подписки на клиенте
      * @return модель подписки
      */
     @Override
     public SubscriptionModel createSubscription(CreateSubscriptionModel createSubscriptionModel) {
-        Category category = Optional
-                .ofNullable(categoryService.getCategory(createSubscriptionModel.category()))
-                .orElse(categoryService.getCategory("default")
-        );
+        Category category = categoryService.getCategory(createSubscriptionModel.category());
         Subscription subscription = new Subscription(
                 createSubscriptionModel.name(),
                 createSubscriptionModel.price(),
@@ -98,6 +111,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     /**
      * Удалить подписку
+     *
      * @param id - индефикатор подписки в БД
      * @return сообщение об успешном удалении
      */
@@ -105,14 +119,15 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public String deleteSubscription(Long id) {
         if (subscriptionRepository.existsById(id)) {
             subscriptionRepository.deleteById(id);
-            return "Подписка успешна удалена!"; //TODO
+            return "Подписка успешна удалена!";
         } else {
-            throw new EntityNotFoundException("Нет такой подписки");//TODO
+            throw new EntityNotFoundException("Нет такой подписки");
         }
     }
 
     /**
      * Обновить подписку
+     *
      * @param updateSubscriptionModel - параметры, заполненные пользователем на клиенте
      * @return модель подписки
      */

@@ -9,11 +9,13 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ContextConfiguration;
+import ru.matmex.subscription.entities.Category;
 import ru.matmex.subscription.entities.Subscription;
 import ru.matmex.subscription.entities.User;
 import ru.matmex.subscription.models.subscription.CreateSubscriptionModel;
 import ru.matmex.subscription.models.subscription.SubscriptionModel;
 import ru.matmex.subscription.models.subscription.UpdateSubscriptionModel;
+import ru.matmex.subscription.repositories.CategoryRepository;
 import ru.matmex.subscription.repositories.SubscriptionRepository;
 import ru.matmex.subscription.services.CategoryService;
 import ru.matmex.subscription.services.SubscriptionService;
@@ -43,8 +45,10 @@ class SubscriptionServiceImplTest {
     private UserService userService;
     private final SubscriptionModelMapper subscriptionModelMapper = new SubscriptionModelMapper();
     private SubscriptionService subscriptionService;
+    @Mock
+    private CategoryRepository categoryRepository;
 
-    private Subscription defaultSubscription = SubscriptionBuilder.anSubscription().defaultSubscription();
+    private Subscription defaultSubscription;
 
     @BeforeEach
     void setUp() {
@@ -52,7 +56,9 @@ class SubscriptionServiceImplTest {
                 subscriptionRepository,
                 subscriptionModelMapper,
                 categoryService,
-                userService);
+                userService,
+                categoryRepository);
+        defaultSubscription = SubscriptionBuilder.anSubscription().defaultSubscription();
     }
 
     /**
@@ -71,12 +77,19 @@ class SubscriptionServiceImplTest {
                         .withUser(testUser)
                         .build());
 
-        when(subscriptionRepository.findSubscriptionByUser(testUser)).thenReturn(Optional.of(subscriptionList));
+        Category category = CategoryBuilder.anCategory()
+                .withName("test")
+                .withUser(testUser)
+                .withSubscriptions(subscriptionList)
+                .build();
+
+        when(categoryRepository.findCategoriesByUser(testUser)).thenReturn(Optional.of(List.of(category)));
+
         List<Subscription> subscriptions = subscriptionService.getSubscriptionsByUser(testUser);
 
         assertThat(subscriptionList.size()).isEqualTo(subscriptions.size());
 
-        verify(subscriptionRepository).findSubscriptionByUser(testUser);
+        verify(categoryRepository).findCategoriesByUser(testUser);
 
     }
 
@@ -95,9 +108,16 @@ class SubscriptionServiceImplTest {
                                 .withPaymentDate(Parser.parseToDate("12-03-2023"))
                                 .withUser(testUser)
                                 .build());
+
+        Category category = CategoryBuilder.anCategory()
+                .withName("test")
+                .withUser(testUser)
+                .withSubscriptions(subscriptionList)
+                .build();
+
         when(userService.getCurrentUser()).thenReturn(testUser);
 
-        when(subscriptionRepository.findSubscriptionByUser(testUser)).thenReturn(Optional.of(subscriptionList));
+        when(categoryRepository.findCategoriesByUser(testUser)).thenReturn(Optional.of(List.of(category)));
 
         List<SubscriptionModel> subscriptionModelList = subscriptionService.getSubscriptions();
         assertThat(subscriptionList.stream().map(subscriptionModelMapper).toList()).isEqualTo(subscriptionModelList);
@@ -120,8 +140,14 @@ class SubscriptionServiceImplTest {
                                 .withUser(testUser)
                                 .build());
 
+        Category category = CategoryBuilder.anCategory()
+                .withName("test")
+                .withUser(testUser)
+                .withSubscriptions(subscriptionList)
+                .build();
+
         when(userService.getCurrentUser()).thenReturn(testUser);
-        when(subscriptionRepository.findSubscriptionByUser(testUser)).thenReturn(Optional.of(subscriptionList));
+        when(categoryRepository.findCategoriesByUser(testUser)).thenReturn(Optional.of(List.of(category)));
         SubscriptionModel actualSubscription = subscriptionService.getSubscription(testUser.getUsername());
 
         assertThat(defaultSubscription.getName()).isEqualTo(actualSubscription.name());
