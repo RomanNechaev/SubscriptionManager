@@ -24,6 +24,7 @@ public class UserController {
 
     /**
      * Обновить пользовательские данные
+     *
      * @param userUpdateModel - данные для обноваления пользвателя
      * @return HTTP ответ с информацией об обноленном пользователи
      */
@@ -34,6 +35,7 @@ public class UserController {
 
     /**
      * Получить информацию о всех пользователей
+     *
      * @return HTTP ответ с информацией о всех пользователях
      */
     @GetMapping(value = "/api/admin/app/users")
@@ -43,6 +45,7 @@ public class UserController {
 
     /**
      * Получить информацию о пользователе по имени
+     *
      * @param username имя пользователя
      * @return HTTP ответ с информаицей о пользователе
      */
@@ -53,6 +56,7 @@ public class UserController {
 
     /**
      * Удалить пользователя
+     *
      * @param username имя пользователя
      * @return HTTP ответ с информаиией об успешном удалении
      */

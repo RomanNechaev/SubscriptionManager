@@ -43,6 +43,9 @@ public class CategoryBuilder {
         return new Category(name, subscriptions, user);
     }
 
+    /***
+     * @return Категория с пользователем по умолчанию, подписок нет
+     */
     public Category defaultCategory() {
         return new Category("test", new ArrayList<>(), UserBuilder.anUser().defaultUser());
     }

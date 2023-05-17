@@ -25,6 +25,7 @@ public class AuthenticationController {
 
     /**
      * Авторизация пользователя
+     *
      * @param authRequest - данные о пользователи
      * @return HTTP ответ об авторизации
      */

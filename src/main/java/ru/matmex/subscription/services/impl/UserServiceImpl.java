@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService {
 
-    UserRepository userRepository;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserModelMapper userModelMapper;
     private final CategoryService categoryService;
@@ -50,9 +50,10 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Загрузить пользователя по имени
+     *
      * @param username - имя пользователя
      * @return авторизовачная информация о пользователе
-     * @throws UsernameNotFoundException
+     * @throws UsernameNotFoundException пользователь не найден
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -64,6 +65,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Добавить пользователя
+     *
      * @param userRegistrationModel - регистрационные данные пользователя
      * @return информация о зарегистрированном пользователе
      */
@@ -82,6 +84,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Обновить пользователя
+     *
      * @param userUpdateModel - обновленная информация о пользователе
      * @return информация об обновленном пользователе
      */
@@ -98,6 +101,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Получить пользователя по имени
+     *
      * @param username - имя пользователя
      * @return информация о пользователе
      */
@@ -109,6 +113,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Преобразовать роль к авторизационной роли spring-security
+     *
      * @param roles список ролей
      * @return список авторизационных ролей
      */
@@ -121,6 +126,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Получить пользователя в текущей сессии
+     *
      * @return сущность пользователя
      */
     @Override
@@ -133,6 +139,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Удалить пользователя
+     *
      * @param username имя пользователя
      * @return информация об удалении
      */
@@ -148,6 +155,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Получить всех пользователей
+     *
      * @return список всех пользователей
      */
     @Override

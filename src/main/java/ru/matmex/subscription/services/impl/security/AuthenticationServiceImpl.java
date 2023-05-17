@@ -11,6 +11,10 @@ import ru.matmex.subscription.models.security.AuthRequest;
 import ru.matmex.subscription.models.security.AuthResponse;
 import ru.matmex.subscription.services.AuthenticationService;
 import ru.matmex.subscription.services.utils.JwtUtils;
+
+/**
+ * Реализация сервиса для аутентификации пользователей
+ */
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
 
@@ -25,6 +29,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     /**
      * Авторизация пользователя
+     *
      * @param authRequest авторазационные данные пользователя
      * @return ответ, содержащий необходимую авторизационную информацию
      */
@@ -40,6 +45,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     /**
      * Проверить что авторизационные аргументы не null
+     *
      * @param authRequest авторазационные данные пользователя
      */
     private void checkOnNull(AuthRequest authRequest) {
@@ -50,6 +56,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     /**
      * Получить аутенфикацию пользователя
+     *
      * @param authRequest авторазационные данные пользователя
      * @return пользователя (Principal) с точки зрения Spring Security.
      */

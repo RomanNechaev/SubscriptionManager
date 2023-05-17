@@ -23,10 +23,16 @@ import ru.matmex.subscription.config.jwt.AuthTokenFilter;
 @EnableWebSecurity
 public class WebSecurityConfig {
 
+    private final AuthEntryPointJwt unauthorizedHandler;
+
     @Autowired
-    private AuthEntryPointJwt unauthorizedHandler;
+    public WebSecurityConfig(AuthEntryPointJwt unauthorizedHandler) {
+        this.unauthorizedHandler = unauthorizedHandler;
+    }
+
     /**
      * Получить декодировщик пароля
+     *
      * @return декодировщик пароля
      */
     @Bean
@@ -36,6 +42,7 @@ public class WebSecurityConfig {
 
     /**
      * Получить фильтр для аутентификации и валидации пользователя с помощью JWT
+     *
      * @return
      */
     @Bean
@@ -45,6 +52,7 @@ public class WebSecurityConfig {
 
     /**
      * получить менеджер управления аутентификацией
+     *
      * @param authenticationConfiguration - конфигурация аутентификации
      * @return менеджер аутентификации
      * @throws Exception
@@ -53,8 +61,10 @@ public class WebSecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
+
     /**
      * Обработать цепочку фильтров
+     *
      * @param http тело http пакета
      * @return сконфигурированный http ответ
      * @throws Exception
@@ -69,7 +79,7 @@ public class WebSecurityConfig {
                 .requestMatchers("/auth/login").permitAll()
                 .requestMatchers("/registration").permitAll()
                 .requestMatchers("/api/app/**").hasRole("USER")
-                .requestMatchers(HttpMethod.DELETE,"/api/admin/app/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/admin/app/**").hasRole("ADMIN")
                 .anyRequest().authenticated();
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

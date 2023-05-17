@@ -1,11 +1,11 @@
 package ru.matmex.subscription.services.utils.mapping;
 
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import ru.matmex.subscription.entities.Subscription;
 import ru.matmex.subscription.models.subscription.SubscriptionModel;
 
 import java.util.function.Function;
+
 /**
  * Преобразование сущности подписки в DTO
  */

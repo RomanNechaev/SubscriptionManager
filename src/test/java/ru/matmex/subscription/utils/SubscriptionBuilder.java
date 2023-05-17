@@ -55,7 +55,7 @@ public class SubscriptionBuilder {
         return SubscriptionBuilder.anSubscription()
                 .withName("test")
                 .withPrice(12.0)
-                .withPaymentDate(new Date(1, 2, 3))
+                .withPaymentDate(new Date())
                 .withCategory(CategoryBuilder.anCategory().defaultCategory())
                 .withUser(UserBuilder.anUser().defaultUser())
                 .build();

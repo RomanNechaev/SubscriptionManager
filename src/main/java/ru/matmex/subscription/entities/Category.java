@@ -52,4 +52,7 @@ public class Category {
         return user;
     }
 
+    public void setSubscriptions(List<Subscription> subscriptions) {
+        this.subscriptions = subscriptions;
+    }
 }

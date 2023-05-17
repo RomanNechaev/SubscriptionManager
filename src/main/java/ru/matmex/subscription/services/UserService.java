@@ -16,6 +16,7 @@ public interface UserService extends UserDetailsService {
     UserModel getUser(String username);
 
     User getCurrentUser();
+
     String delete(String username);
 
     List<UserModel> getUsers();

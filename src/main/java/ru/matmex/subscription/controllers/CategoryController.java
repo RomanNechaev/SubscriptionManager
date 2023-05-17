@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.matmex.subscription.models.category.CategoryModel;
 import ru.matmex.subscription.models.category.CreateCategoryModel;
 import ru.matmex.subscription.models.category.UpdateCategoryModel;
-import ru.matmex.subscription.models.subscription.SubscriptionModel;
-import ru.matmex.subscription.models.subscription.UpdateSubscriptionModel;
 import ru.matmex.subscription.services.CategoryService;
 
 import java.util.List;
@@ -24,8 +22,10 @@ public class CategoryController {
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }
+
     /**
      * Создать категорию
+     *
      * @param createCategoryModel - данные о категории, заполненные пользователем на клиенте
      * @return HTTP ответ о созданной категории
      */
@@ -36,6 +36,7 @@ public class CategoryController {
 
     /**
      * Получить категорию по имени
+     *
      * @param name имя категории
      * @return HTTP ответ с информацией о категории
      */
@@ -46,6 +47,7 @@ public class CategoryController {
 
     /**
      * Получить категории текущего пользователя
+     *
      * @return HTTP ответ с информацией о категориях
      */
     @GetMapping(value = "/api/app/categories")
@@ -55,6 +57,7 @@ public class CategoryController {
 
     /**
      * Обновить категорию
+     *
      * @param updateSubscriptionModel данные об обновленной категории, заполненные пользователем на клиенте
      * @return HTTP ответ с информацией об обноленной категории
      */
@@ -65,6 +68,7 @@ public class CategoryController {
 
     /**
      * Удалить категорию
+     *
      * @param id индефикатор категории в БД
      * @return HTTP ответ об удалении
      */

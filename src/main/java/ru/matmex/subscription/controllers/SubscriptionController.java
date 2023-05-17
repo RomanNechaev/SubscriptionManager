@@ -8,6 +8,7 @@ import ru.matmex.subscription.models.subscription.CreateSubscriptionModel;
 import ru.matmex.subscription.models.subscription.SubscriptionModel;
 import ru.matmex.subscription.models.subscription.UpdateSubscriptionModel;
 import ru.matmex.subscription.services.SubscriptionService;
+
 import java.util.List;
 
 /**
@@ -24,6 +25,7 @@ public class SubscriptionController {
 
     /**
      * Получить подписки текущего пользователя
+     *
      * @return HTTP ответ с подписками текущего пользователя
      */
     @GetMapping(value = "/api/app/subscriptions")
@@ -33,6 +35,7 @@ public class SubscriptionController {
 
     /**
      * Получить информацию о подписке по названию
+     *
      * @param name - название подписки
      * @return HTTP ответ с информацией о подписки
      */
@@ -43,6 +46,7 @@ public class SubscriptionController {
 
     /**
      * Создать подписку
+     *
      * @param createSubscriptionModel данные о подписки, заполненные пользователем на клиенте
      * @return HTTP ответ с информаицей об созданной подписке
      */
@@ -53,6 +57,7 @@ public class SubscriptionController {
 
     /**
      * Обновить подписку
+     *
      * @param updateSubscriptionModel данные об обновленной подписке, заполненные пользователем на клиенте
      * @return HTTP ответ с информаицей об обновленной подписке
      */
@@ -63,12 +68,12 @@ public class SubscriptionController {
 
     /**
      * Удалить подписку
+     *
      * @param id - индефикатор подписки в БД
      * @return HTTP ответ об успешном удалении подписки
      */
     @DeleteMapping(value = "/api/app/subscription/{id}")
     public ResponseEntity<String> delete(@PathVariable Long id) {
-        subscriptionService.deleteSubscription(id);
         return ResponseEntity.ok(subscriptionService.deleteSubscription(id));
     }
 }

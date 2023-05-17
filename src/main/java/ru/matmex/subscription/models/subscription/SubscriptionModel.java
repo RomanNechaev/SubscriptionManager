@@ -10,5 +10,5 @@ public record SubscriptionModel(
         String name,
         Date paymentDate,
         Double price,
-        String category)
-{}
+        String category) {
+}

@@ -156,16 +156,6 @@ class UserServiceImplTest {
      */
     @Test
     void testGetCurrentUser() {
-//        Authentication authentication = mock(Authentication.class);
-//        when(authentication.getName()).thenReturn("invalidName");
-//
-//        when(userRepository.findByUsername("invalidName")).thenReturn(Optional.empty());
-//
-//        assertThatThrownBy(()->userService.getCurrentUser())
-//                .isInstanceOf(UsernameNotFoundException.class)
-//                .hasMessageContaining("User not found");
-
-//        assertThat("testUser").isSameAs(obtainedUser.getUsername());
     }
 
     /**

@@ -23,6 +23,7 @@ public class RegistrationController {
 
     /**
      * Регистрация пользователя в приложении
+     *
      * @param userRegistrationModel - данные о пользователе
      * @return HTTP ответ с данными о пользователе
      */

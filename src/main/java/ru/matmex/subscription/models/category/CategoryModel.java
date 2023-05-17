@@ -4,4 +4,5 @@ import ru.matmex.subscription.entities.Subscription;
 
 import java.util.List;
 
-public record CategoryModel(Long id, String name, List<Subscription> subscriptions) {}
+public record CategoryModel(Long id, String name, List<Subscription> subscriptions) {
+}

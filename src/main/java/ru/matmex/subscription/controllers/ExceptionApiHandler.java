@@ -22,6 +22,7 @@ public class ExceptionApiHandler {
     public ResponseEntity<ErrorMessage> notFoundException(EntityNotFoundException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorMessage(exception.getMessage()));
     }
+
     /**
      * @param exception Имя пользователя не найдено
      * @return Возвращает сообщение о том, что имя пользователя не найдено
@@ -30,6 +31,7 @@ public class ExceptionApiHandler {
     public ResponseEntity<ErrorMessage> usernameNotFoundException(UsernameNotFoundException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorMessage(exception.getMessage()));
     }
+
     /**
      * @param exception Недопустимое состояние аргументов
      * @return Возвращает сообщение о том, пользователь передал недопустимое состояние аргументов
@@ -38,6 +40,7 @@ public class ExceptionApiHandler {
     public ResponseEntity<ErrorMessage> illegalArgumentException(IllegalArgumentException exception) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorMessage(exception.getMessage()));
     }
+
     /**
      * @param exception Сущность в бд уже существует
      * @return Возвращает сообщение о том, сущность в БД уже существует
