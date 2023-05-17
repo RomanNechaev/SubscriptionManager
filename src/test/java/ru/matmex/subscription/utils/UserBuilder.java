@@ -1,12 +1,8 @@
 package ru.matmex.subscription.utils;
 
 
-import ru.matmex.subscription.entities.Category;
-import ru.matmex.subscription.entities.Subscription;
 import ru.matmex.subscription.entities.User;
 
-import java.util.ArrayList;
-import java.util.List;
 /**
  * Создание объекта пользователя
  */
@@ -16,8 +12,6 @@ public class UserBuilder {
     private String password;
 
     private String email;
-    private List<Category> categories = new ArrayList<>();
-    private List<Subscription> subscriptions = new ArrayList<>();
 
     private UserBuilder() {
     }

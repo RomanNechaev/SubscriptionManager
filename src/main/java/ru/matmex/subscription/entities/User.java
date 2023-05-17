@@ -22,7 +22,6 @@ public class User {
         this.username = username;
         this.email = email;
         this.password = password;
-        this.subscriptions = new ArrayList<>();
         this.categories = new ArrayList<>();
         roles.add(Role.USER);
     }
@@ -31,7 +30,6 @@ public class User {
         this.username = username;
         this.email = email;
         this.password = password;
-        this.subscriptions = new ArrayList<>();
         this.categories = new ArrayList<>();
         roles.add(role);
     }
@@ -45,14 +43,9 @@ public class User {
     private String password;
 
     private String email;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Subscription> subscriptions;
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Category> categories;
 
-    //@ManyToMany(fetch = FetchType.LAZY)
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
@@ -75,24 +68,12 @@ public class User {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public List<Subscription> getSubscriptions() {
-        return subscriptions;
-    }
-
-    public void setSubscriptions(List<Subscription> subscriptions) {
-        this.subscriptions = subscriptions;
     }
 
     public Set<Role> getRoles() {
@@ -105,10 +86,6 @@ public class User {
 
     public List<Category> getCategories() {
         return categories;
-    }
-
-    public void setCategories(List<Category> categories) {
-        this.categories = categories;
     }
 
 }
