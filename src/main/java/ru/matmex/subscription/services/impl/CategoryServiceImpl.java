@@ -43,8 +43,9 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     /**
-        Получить категорию текущего юзера
-        @return Список категорий текущего пользователя
+     * Получить категорию текущего юзера
+     *
+     * @return Список категорий текущего пользователя
      */
     @Override
     public List<CategoryModel> getCategoriesByCurrentUsername() {
@@ -57,18 +58,20 @@ public class CategoryServiceImpl implements CategoryService {
 
     /**
      * Получить категорию по имени
+     *
      * @param name Имя категории
      * @return категория с именем name
      */
     @Override
     public Category getCategory(String name) {
         return categoryRepository
-                .findCategoryByName(name)
+                .findCategoryByNameAndUser(name, userService.getCurrentUser())
                 .orElseThrow(EntityNotFoundException::new);
     }
 
     /**
      * Преобразовать сущность категории в модель категории
+     *
      * @param name имя категори
      * @return модель категории
      */
@@ -79,12 +82,13 @@ public class CategoryServiceImpl implements CategoryService {
 
     /**
      * Создать категорию
+     *
      * @param createCategoryModel - данные, заполненные пользователем при создании категории на клиенте
      * @return модель категории
      */
     @Override
     public CategoryModel create(CreateCategoryModel createCategoryModel) {
-        if (categoryRepository.existsByName(createCategoryModel.name())) {
+        if (categoryRepository.existsByNameAndUser(createCategoryModel.name(), userService.getCurrentUser())) {
             throw new EntityExistsException("Сущность с именем" + createCategoryModel.name() + "уже существует");
         }
         Category category = new Category(createCategoryModel.name(), new ArrayList<>(), userService.getCurrentUser());
@@ -94,6 +98,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     /**
      * Создать категорию по умолчанию
+     *
      * @param user - Сущность юзера
      */
     @Override
@@ -104,6 +109,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     /**
      * Обновить категорию
+     *
      * @param updateCategoryModel параметры, заполненные пользователем на клиенте
      * @return модель категории
      */
@@ -119,6 +125,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     /**
      * Удалить категорию
+     *
      * @param id - индетификатор категории в БД
      * @return Сообщение об успешном удалении, в случае если не произошла ошибка
      */
@@ -126,11 +133,11 @@ public class CategoryServiceImpl implements CategoryService {
     public String delete(Long id) {
         if (categoryRepository.existsById(id)) {
             categoryRepository
-                    .findAllById(Collections.singleton(id))
+                    .findCategoryById(id).orElseThrow().getSubscriptions()
                     .forEach(subscription -> subscriptionService.deleteSubscription(subscription.getId())
                     );
             categoryRepository.deleteAllById(Collections.singleton(id));
-            return "Подписка успешна удалена!"; //TODO
+            return "Категория успешна удалена!";
         } else throw new EntityNotFoundException();
     }
 }

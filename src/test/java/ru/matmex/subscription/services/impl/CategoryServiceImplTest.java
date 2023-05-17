@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
 @ContextConfiguration(classes = {CategoryServiceImpl.class})
 @ExtendWith(MockitoExtension.class)
 class CategoryServiceImplTest {
@@ -45,6 +46,7 @@ class CategoryServiceImplTest {
     private SubscriptionService subscriptionService;
 
     private CategoryService categoryService;
+
 
     @BeforeEach
     void setUp() {
@@ -88,14 +90,15 @@ class CategoryServiceImplTest {
     void testCanGetCategoryByName() {
         String categoryName = "test";
         Category testCategory = CategoryBuilder.anCategory().defaultCategory();
-
-        when(categoryRepository.findCategoryByName(categoryName)).thenReturn(Optional.of(testCategory));
+        User testUser = UserBuilder.anUser().defaultUser();
+        when(userService.getCurrentUser()).thenReturn(testUser);
+        when(categoryRepository.findCategoryByNameAndUser(categoryName, testUser)).thenReturn(Optional.of(testCategory));
 
         Category actualCategory = categoryService.getCategory(categoryName);
 
         assertThat(actualCategory).isEqualTo(testCategory);
 
-        verify(categoryRepository).findCategoryByName(categoryName);
+        verify(categoryRepository).findCategoryByNameAndUser(categoryName, testUser);
     }
 
     /**
@@ -103,8 +106,10 @@ class CategoryServiceImplTest {
      */
     @Test
     void testCanCreateCategory() {
+        User testUser = UserBuilder.anUser().defaultUser();
         CreateCategoryModel createCategoryModel = new CreateCategoryModel("test");
-        given(categoryRepository.existsByName("test")).willReturn(true);
+        given(categoryRepository.existsByNameAndUser("test", testUser)).willReturn(false);
+        when(userService.getCurrentUser()).thenReturn(testUser);
         categoryService.create(createCategoryModel);
 
         ArgumentCaptor<Category> categoryArgumentCaptor = ArgumentCaptor.forClass(Category.class);
@@ -141,7 +146,9 @@ class CategoryServiceImplTest {
     @Test
     void testWillThrowWhenCreateCategoryExists() {
         CreateCategoryModel createCategoryModel = new CreateCategoryModel("test");
-        given(categoryRepository.existsByName("test")).willReturn(false);
+        User testUser = UserBuilder.anUser().defaultUser();
+        when(userService.getCurrentUser()).thenReturn(testUser);
+        given(categoryRepository.existsByNameAndUser("test", testUser)).willReturn(true);
 
         assertThatThrownBy(() -> categoryService.create(createCategoryModel))
                 .isInstanceOf(EntityExistsException.class)
@@ -182,7 +189,7 @@ class CategoryServiceImplTest {
     void testCanDeleteCategory() {
         Long categoryId = 12L;
         given(categoryRepository.existsById(categoryId)).willReturn(true);
-
+        when(categoryRepository.findCategoryById(categoryId)).thenReturn(Optional.of(CategoryBuilder.anCategory().defaultCategory()));
         categoryService.delete(categoryId);
 
         verify(categoryRepository).deleteAllById(Collections.singleton(categoryId));
@@ -207,7 +214,9 @@ class CategoryServiceImplTest {
     @Test
     void testCanMapToCategoryModel() {
         Category category = CategoryBuilder.anCategory().defaultCategory();
-        when(categoryRepository.findCategoryByName(category.getName())).thenReturn(Optional.of(category));
+        User testUser = UserBuilder.anUser().defaultUser();
+        when(userService.getCurrentUser()).thenReturn(testUser);
+        when(categoryRepository.findCategoryByNameAndUser(category.getName(), testUser)).thenReturn(Optional.of(category));
         CategoryModel categoryModel = categoryService.getCategoryToClient(category.getName());
 
         assertThat(categoryModel).
