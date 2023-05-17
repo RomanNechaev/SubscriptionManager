@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import ru.matmex.subscription.entities.User;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -25,6 +24,7 @@ public class JwtUtils {
 
     /**
      * Преобразование секретного ключа
+     *
      * @param secretKey "сырой" секретный ключ
      */
     public JwtUtils(@Value("${jwt.secretkey}") String secretKey) {

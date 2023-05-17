@@ -4,10 +4,12 @@ import jakarta.persistence.EntityExistsException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 import ru.matmex.subscription.models.user.UserModel;
@@ -17,6 +19,7 @@ import ru.matmex.subscription.services.impl.export.reports.Report;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
@@ -35,24 +38,27 @@ public class PDFService implements ExportReportService {
     }
 
     @Override
-    public InputStreamResource loadReport(String nameReport) {
+    public byte[] loadReport(String nameReport) {
         String userName = userService.getCurrentUser().getUsername();
         UserModel user = userService.getUser(userName);
-        PDDocument pdDocument = Optional.ofNullable(reportToPDF(Report.valueOf(nameReport).calculate(user))).orElseThrow(NullPointerException::new);
-        ByteArrayInputStream bytes = mapToByteArrayInputStream(pdDocument);
-        return new InputStreamResource(bytes);
+        return reportToPDF(Report.valueOf(nameReport).calculate(user));
     }
 
     /**
      * Формирование отчета в pdf формате
+     *
+     * @param report отчет(формат: категория -> стоимость всех подписок)
+     * @return массив байт, содержащий отчет
      */
-    private PDDocument reportToPDF(Map<String, Double> report) {
-        try (PDDocument pdfDocument = new PDDocument()) {
+    private byte[] reportToPDF(Map<String, Double> report) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+        try (PDDocument doc = new PDDocument()) {
             PDPage myPage = new PDPage();
-            pdfDocument.addPage(myPage);
-            try (PDPageContentStream cont = new PDPageContentStream(pdfDocument, myPage)) {
+            doc.addPage(myPage);
+            try (PDPageContentStream cont = new PDPageContentStream(doc, myPage)) {
                 cont.beginText();
-                cont.setFont(PDType1Font.TIMES_ROMAN, 12);
+                cont.setFont(PDType0Font.load(doc, new File("/home/romenka/subscription/src/main/resources/fonts/Roboto-Black.ttf")), 12);
                 cont.setLeading(14.5f);
                 cont.newLineAtOffset(25, 700);
                 for (String key : report.keySet()) {
@@ -61,28 +67,12 @@ public class PDFService implements ExportReportService {
                 }
                 cont.endText();
             }
-            return pdfDocument;
+            doc.save(byteArrayOutputStream);
         } catch (IOException e) {
             logger.error(String.format("Не удалось создать .pdf файл для экспорта отчетов у %s",
                     userService.getCurrentUser()));
             e.printStackTrace();
         }
-        return null;
-    }
-
-    /**
-     * Преобразовать документ в массив байт
-     *
-     * @param pdfDocument отчет в формате pdf документа
-     * @return массив байт
-     */
-    private ByteArrayInputStream mapToByteArrayInputStream(PDDocument pdfDocument) {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        try {
-            pdfDocument.save(byteArrayOutputStream);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+        return byteArrayOutputStream.toByteArray();
     }
 }
