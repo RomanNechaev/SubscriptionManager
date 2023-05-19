@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.matmex.subscription.models.user.UserModel;
 import ru.matmex.subscription.models.user.UserUpdateModel;
 import ru.matmex.subscription.services.UserService;
+import ru.matmex.subscription.services.notifications.Notifiable;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ import java.util.List;
  * Контроллер для операций с юзерами
  */
 @Controller
-public class UserController {
+public class UserController extends Notifiable {
     private final UserService userService;
 
     @Autowired
@@ -62,6 +63,8 @@ public class UserController {
      */
     @DeleteMapping(value = "/api/admin/app/{username}")
     public ResponseEntity<String> delete(@PathVariable String username) {
+        registerNotification(username + "Успешно удален");
         return ResponseEntity.ok(userService.delete(username));
+
     }
 }
