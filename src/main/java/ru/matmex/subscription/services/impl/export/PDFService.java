@@ -40,7 +40,6 @@ public class PDFService implements ExportReportService {
 
     /**
      * Формирование отчета в pdf формате
-     *
      * @param report отчет(формат: категория -> стоимость всех подписок)
      * @return массив байт, содержащий отчет
      */
