@@ -8,19 +8,29 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 /**
  * Брокер который управляет уведомлениями и отправляет их нужным подписчикам
  */
-public class NotificationBroker {
+public final class NotificationBroker {
+    private static volatile NotificationBroker instance = null;
     private final Queue<Notification> notifications;
     private final List<NotificationSender> notificationSenderList;
 
-    NotificationBroker() {
+    private NotificationBroker() {
         this.notifications = new ConcurrentLinkedQueue<>();
         this.notificationSenderList = new ArrayList<>();
+    }
+
+    public static NotificationBroker getInstance() {
+        if (instance == null) {
+            synchronized (NotificationBroker.class) {
+                instance = new NotificationBroker();
+            }
+        }
+        return instance;
     }
 
     /**
      * Добавить уведомление в очередь
      */
-    private void addNotification(Notification notification) {
+    public synchronized void addNotification(Notification notification) {
         notifications.add(notification);
     }
 
@@ -36,7 +46,7 @@ public class NotificationBroker {
     /**
      * Отправить уведомление всем рассыльщикам
      */
-    private void notifyAllSubscriber() {
+    public synchronized void notifyAllSubscriber() {
         for (NotificationSender sender : notificationSenderList) {
             sender.sendNotification(getLastNotification());
         }
