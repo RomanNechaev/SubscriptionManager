@@ -1,13 +1,12 @@
 package ru.matmex.subscription.entities;
 
 import jakarta.persistence.*;
+import ru.matmex.subscription.models.user.Role;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import ru.matmex.subscription.models.user.Role;
 
 /**
  * Сущность пользователя

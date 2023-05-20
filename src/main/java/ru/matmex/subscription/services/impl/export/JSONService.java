@@ -11,8 +11,6 @@ import ru.matmex.subscription.services.ExportReportService;
 import ru.matmex.subscription.services.UserService;
 import ru.matmex.subscription.services.impl.export.reports.Report;
 
-import java.util.Map;
-
 /**
  * Создание отчета в формате JSON
  */
