@@ -8,8 +8,11 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.Properties;
 
+/**
+ * Конфигурация отправителя сообщений
+ */
 @Configuration
-public class MailConfig {
+public class MailConfiguration {
     @Value("${spring.mail.host}")
     private String host;
     @Value("${spring.mail.username}")
@@ -21,17 +24,22 @@ public class MailConfig {
     @Value("${spring.mail.protocol}")
     private String protocol;
 
+
     @Bean
-    public JavaMailSender getMailSender() {
+    public JavaMailSender getJavaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost(host);
         mailSender.setUsername(username);
         mailSender.setPassword(password);
         mailSender.setPort(port);
-        mailSender.setProtocol(protocol);
 
         Properties properties = mailSender.getJavaMailProperties();
-        properties.setProperty("mail.sender.protocol", protocol);
+
+        properties.setProperty("mail.transport.protocol", protocol);
+        properties.setProperty("mail.transport.protocol", "smtp");
+        properties.setProperty("mail.smtp.starttls.enable", "true");
+        properties.put("mail.smtp.auth", "true");
+        properties.setProperty("mail.smtp.ssl.enable", "true");
         return mailSender;
     }
 }

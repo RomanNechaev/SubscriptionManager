@@ -13,17 +13,15 @@ import ru.matmex.subscription.services.notifications.NotificationSender;
 
 @Service
 public class EmailNotificationSender implements NotificationSender {
-    private final JavaMailSender mailSender;
+    private final JavaMailSender notificationMailSender;
     private final SimpleMailMessage templateMessage;
-
     private static final Logger logger = LoggerFactory.getLogger(EmailNotificationSender.class);
-
     private final UserService userService;
 
     @Autowired
-    public EmailNotificationSender(UserService userService, JavaMailSender mailSender) {
+    public EmailNotificationSender(JavaMailSender notificationMailSender, UserService userService) {
+        this.notificationMailSender = notificationMailSender;
         this.userService = userService;
-        this.mailSender = mailSender;
         this.templateMessage = new SimpleMailMessage();
     }
 
@@ -31,19 +29,19 @@ public class EmailNotificationSender implements NotificationSender {
     @Override
     public void sendNotification(Notification notification) {
         SimpleMailMessage message = new SimpleMailMessage(this.templateMessage);
-        String userEmail = userService.getCurrentUser().getEmail();
+        String userEmail = userService.getUser(notification.getUsername()).email();
+        String emailFrom = "petrlovygin@yandex.ru";
+        message.setSubject("Уведомление");
+        message.setFrom(emailFrom);
         message.setTo(userEmail);
         message.setText(notification.getMessage());
         message.setSentDate(notification.getCurrentDate());
         try {
-            this.mailSender.send(message);
+            notificationMailSender.send(message);
         } catch (MailException exception) {
             logger.error(String.format("Не удалось отправить сообщение на email:%s", userEmail));
+            logger.error(exception.getMessage());
         }
     }
 
-    @Override
-    public void subscribe() {
-
-    }
 }
