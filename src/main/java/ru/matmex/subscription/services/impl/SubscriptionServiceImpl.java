@@ -11,7 +11,6 @@ import ru.matmex.subscription.models.subscription.SubscriptionModel;
 import ru.matmex.subscription.models.subscription.UpdateSubscriptionModel;
 import ru.matmex.subscription.repositories.CategoryRepository;
 import ru.matmex.subscription.repositories.SubscriptionRepository;
-import ru.matmex.subscription.repositories.UserRepository;
 import ru.matmex.subscription.services.CategoryService;
 import ru.matmex.subscription.services.SubscriptionService;
 import ru.matmex.subscription.services.UserService;
@@ -21,8 +20,6 @@ import ru.matmex.subscription.services.utils.mapping.SubscriptionModelMapper;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Реализация сервиса для операций с подписками

@@ -11,15 +11,13 @@ import ru.matmex.subscription.services.ExportReportService;
 import ru.matmex.subscription.services.UserService;
 import ru.matmex.subscription.services.impl.export.reports.Report;
 
-import java.util.Map;
-
 /**
  * Создание отчета в формате JSON
  */
 @Service
 public class JSONService implements ExportReportService {
     UserService userService;
-    private static final Logger logger = LoggerFactory.getLogger(PDFService.class);
+    private static final Logger logger = LoggerFactory.getLogger(JSONService.class);
 
     @Autowired
     public JSONService(UserService userService) {
