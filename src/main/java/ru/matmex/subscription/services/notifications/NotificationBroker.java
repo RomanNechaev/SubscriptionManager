@@ -18,6 +18,12 @@ public final class NotificationBroker {
         this.notificationSenderList = new ArrayList<>();
     }
 
+    /**
+     * Получить экземляр объекта
+     * <p>Класс {@link NotificationBroker} реализует паттерн Singleton</p>
+     *
+     * @return экземпляр класса
+     */
     public static NotificationBroker getInstance() {
         if (instance == null) {
             synchronized (NotificationBroker.class) {
@@ -47,8 +53,9 @@ public final class NotificationBroker {
      * Отправить уведомление всем рассыльщикам
      */
     public synchronized void notifyAllSubscriber() {
+        Notification lastNotification = getLastNotification();
         for (NotificationSender sender : notificationSenderList) {
-            sender.sendNotification(getLastNotification());
+            sender.sendNotification(lastNotification);
         }
     }
 
@@ -57,7 +64,7 @@ public final class NotificationBroker {
      *
      * @param sender - рассыльщик уведомлений
      */
-    private void addNotificationSender(NotificationSender sender) {
+    public void addNotificationSender(NotificationSender sender) {
         notificationSenderList.add(sender);
     }
 

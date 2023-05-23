@@ -9,9 +9,11 @@ public class Notification {
 
     private final String message;
     private final Date currentDate;
+    private final String username;
 
-    public Notification(String message) {
+    public Notification(String message, String username) {
         this.message = message;
+        this.username = username;
         this.currentDate = new Date();
     }
 
@@ -22,4 +24,9 @@ public class Notification {
     public Date getCurrentDate() {
         return currentDate;
     }
+
+    public String getUsername() {
+        return username;
+    }
+
 }
