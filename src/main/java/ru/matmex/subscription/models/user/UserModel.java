@@ -4,6 +4,6 @@ import ru.matmex.subscription.models.category.CategoryModel;
 
 import java.util.List;
 
-public record UserModel(Long id, String username,
+public record UserModel(Long id, String username, String email,
                         List<CategoryModel> categories) {
 }

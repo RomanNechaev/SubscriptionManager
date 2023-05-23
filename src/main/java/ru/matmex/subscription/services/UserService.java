@@ -20,4 +20,8 @@ public interface UserService extends UserDetailsService {
     String delete(String username);
 
     List<UserModel> getUsers();
+
+    String checkIntegrationWithTelegram();
+
+    void setTelegramChatId(String username, long telegramChatId);
 }

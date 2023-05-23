@@ -1,28 +1,22 @@
 package ru.matmex.subscription.services.impl.export;
 
-import jakarta.persistence.EntityExistsException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 import ru.matmex.subscription.models.user.UserModel;
 import ru.matmex.subscription.services.ExportReportService;
 import ru.matmex.subscription.services.UserService;
 import ru.matmex.subscription.services.impl.export.reports.Report;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Создание отчета в формате pdf

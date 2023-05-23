@@ -137,6 +137,14 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found")); //TODO
     }
 
+    public void setTelegramChatId(String username, long telegramChatId) {
+        User user = userRepository
+                .findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        user.setTelegramChatId(telegramChatId);
+        userRepository.save(user);
+    }
+
     /**
      * Удалить пользователя
      *
@@ -163,6 +171,11 @@ public class UserServiceImpl implements UserService {
         return userRepository
                 .findAll()
                 .stream().map(userModelMapper).toList();
+    }
+
+    @Override
+    public String checkIntegrationWithTelegram() {
+        return getCurrentUser().getTelegramChatId() > 0 ? "Телеграмм успешно подключен" : "Телеграмм не подключен";
     }
 
     /**

@@ -26,6 +26,7 @@ public class UserModelMapper implements Function<User, UserModel> {
         return new UserModel(
                 user.getId(),
                 user.getUsername(),
+                user.getEmail(),
                 user.getCategories()
                         .stream()
                         .map(categoryModelMapper).toList());

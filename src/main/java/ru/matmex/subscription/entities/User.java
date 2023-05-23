@@ -1,13 +1,12 @@
 package ru.matmex.subscription.entities;
 
 import jakarta.persistence.*;
+import ru.matmex.subscription.models.user.Role;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import ru.matmex.subscription.models.user.Role;
 
 /**
  * Сущность пользователя
@@ -43,6 +42,7 @@ public class User {
     private String password;
 
     private String email;
+    private Long telegramChatId;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Category> categories;
 
@@ -86,6 +86,14 @@ public class User {
 
     public List<Category> getCategories() {
         return categories;
+    }
+
+    public long getTelegramChatId() {
+        return telegramChatId;
+    }
+
+    public void setTelegramChatId(long telegramChatId) {
+        this.telegramChatId = telegramChatId;
     }
 
 }
