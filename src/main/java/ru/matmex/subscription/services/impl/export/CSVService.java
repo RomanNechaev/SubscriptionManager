@@ -56,9 +56,11 @@ public class CSVService implements ExportReportService {
             csvPrinter.flush();
             return out.toByteArray();
         } catch (IOException e) {
+
             logger.error(String.format("Не удалось создать .csv файл для экспорта отчетов у %s",
                     userService.getCurrentUser()));
-            throw new RuntimeException(e);
+            throw new RuntimeException(String.format("Не удалось создать .csv файл для экспорта отчетов у %s",
+                    userService.getCurrentUser()));
         }
     }
 }

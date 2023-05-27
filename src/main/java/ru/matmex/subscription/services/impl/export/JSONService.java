@@ -38,7 +38,8 @@ public class JSONService implements ExportReportService {
         } catch (JsonProcessingException e) {
             logger.error(String.format("Не удалось создать .json файл для экспорта отчетов у %s",
                     userService.getCurrentUser()));
-            throw new RuntimeException(e);
+            throw new RuntimeException(String.format("Не удалось создать .json файл для экспорта отчетов у %s",
+                    userService.getCurrentUser()));
         }
     }
 }

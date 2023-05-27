@@ -3,7 +3,7 @@ package ru.matmex.subscription.services.impl.export;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.font.PDType0Font;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,6 @@ import ru.matmex.subscription.services.UserService;
 import ru.matmex.subscription.services.impl.export.reports.Report;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
@@ -23,6 +22,20 @@ import java.util.Map;
  */
 @Service
 public class PDFService implements ExportReportService {
+    /**
+     * Размер междустрочного пробела
+     */
+    private static final float LEADING = 14.5f;
+    /**
+     * Первоначальное положение текста по X и Y
+     */
+    private static final int LINEAR_OFFSET_X = 25;
+    private static final int LINEAR_OFFSET_Y = 700;
+    /**
+     * Размер шрифта
+     */
+    private static final int FONT_SIZE = 12;
+
     UserService userService;
     private static final Logger logger = LoggerFactory.getLogger(PDFService.class);
 
@@ -40,20 +53,21 @@ public class PDFService implements ExportReportService {
 
     /**
      * Формирование отчета в pdf формате
+     *
      * @param report отчет(формат: категория -> стоимость всех подписок)
      * @return массив байт, содержащий отчет
      */
     private byte[] reportToPDF(Map<String, Double> report) {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-        try (PDDocument doc = new PDDocument()) {
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+             PDDocument doc = new PDDocument()) {
             PDPage myPage = new PDPage();
             doc.addPage(myPage);
             try (PDPageContentStream cont = new PDPageContentStream(doc, myPage)) {
                 cont.beginText();
-                cont.setFont(PDType0Font.load(doc, new File("./src/main/resources/fonts/Roboto-Black.ttf")), 12);
-                cont.setLeading(14.5f);
-                cont.newLineAtOffset(25, 700);
+                cont.setFont(PDType1Font.TIMES_ROMAN, FONT_SIZE);
+                cont.setLeading(LEADING);
+                cont.newLineAtOffset(LINEAR_OFFSET_X, LINEAR_OFFSET_Y);
                 for (String key : report.keySet()) {
                     cont.showText(key + " : " + report.get(key));
                     cont.newLine();
@@ -61,11 +75,12 @@ public class PDFService implements ExportReportService {
                 cont.endText();
             }
             doc.save(byteArrayOutputStream);
+            return byteArrayOutputStream.toByteArray();
         } catch (IOException e) {
             logger.error(String.format("Не удалось создать .pdf файл для экспорта отчетов у %s",
                     userService.getCurrentUser()));
-            e.printStackTrace();
+            throw new RuntimeException(String.format("Не удалось создать .pdf файл для экспорта отчетов у %s",
+                    userService.getCurrentUser()));
         }
-        return byteArrayOutputStream.toByteArray();
     }
 }
