@@ -5,16 +5,14 @@ import ru.matmex.subscription.entities.Category;
 import ru.matmex.subscription.models.category.CategoryModel;
 
 import java.util.Objects;
-import java.util.function.Function;
 
 /**
- * Преобразование сущности категории в DTO
+ * Преобразование сущности категории в модель категории
  */
 @Component
-public class CategoryModelMapper implements Function<Category, CategoryModel> {
+public class CategoryModelMapper {
 
-    @Override
-    public CategoryModel apply(Category category) {
+    public CategoryModel map(Category category) {
         return new CategoryModel(category.getId(),
                 category.getName(),
                 category.getSubscriptions()

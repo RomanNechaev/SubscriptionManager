@@ -1,5 +1,6 @@
 package ru.matmex.subscription.services.impl;
 
+import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +25,8 @@ import ru.matmex.subscription.models.user.UserUpdateModel;
 import ru.matmex.subscription.repositories.UserRepository;
 import ru.matmex.subscription.services.CategoryService;
 import ru.matmex.subscription.services.UserService;
+import ru.matmex.subscription.services.utils.mapping.CategoryModelMapper;
+import ru.matmex.subscription.services.utils.mapping.SubscriptionModelMapper;
 import ru.matmex.subscription.services.utils.mapping.UserModelMapper;
 import ru.matmex.subscription.utils.UserBuilder;
 
@@ -42,8 +45,7 @@ class UserServiceImplTest {
     private CategoryService categoryService;
     @Mock
     private PasswordEncoder passwordEncoder;
-    @Mock
-    private UserModelMapper userModelMapper;
+    private UserModelMapper userModelMapper = new UserModelMapper(new CategoryModelMapper(),new SubscriptionModelMapper());
 
     private UserService userService;
 
@@ -135,7 +137,7 @@ class UserServiceImplTest {
 
         UserModel user = userService.getUser("test");
 
-        assertThat(userModelMapper.build(defaultUser)).isEqualTo(user);
+        assertThat(userModelMapper.map(defaultUser)).isEqualTo(user);
     }
 
     /**
@@ -149,13 +151,6 @@ class UserServiceImplTest {
         assertThatThrownBy(() -> userService.getUser(username))
                 .isInstanceOf(UsernameNotFoundException.class)
                 .hasMessage("User not found");
-    }
-
-    /**
-     * Тестирование получения текущего пользователя
-     */
-    @Test
-    void testGetCurrentUser() {
     }
 
     /**
@@ -205,6 +200,9 @@ class UserServiceImplTest {
         List<UserModel> allUsers = userService.getUsers();
 
         assertThat(usersList.size()).isEqualTo(allUsers.size());
+
+        assertThat(allUsers.get(0).username()).isEqualTo(usersList.get(0).getUsername());
+        assertThat(allUsers.get(1).username()).isEqualTo(usersList.get(1).getUsername());
 
         verify(userRepository).findAll();
     }

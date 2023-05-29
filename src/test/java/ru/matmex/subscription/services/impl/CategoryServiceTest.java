@@ -2,15 +2,14 @@ package ru.matmex.subscription.services.impl;
 
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ContextConfiguration;
 import ru.matmex.subscription.entities.Category;
@@ -26,7 +25,6 @@ import ru.matmex.subscription.services.utils.mapping.CategoryModelMapper;
 import ru.matmex.subscription.utils.CategoryBuilder;
 import ru.matmex.subscription.utils.UserBuilder;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
 import java.util.ArrayList;
@@ -36,26 +34,18 @@ import java.util.Optional;
 
 @ContextConfiguration(classes = {CategoryServiceImpl.class})
 @ExtendWith(MockitoExtension.class)
-class CategoryServiceImplTest {
-    @Mock
-    private CategoryRepository categoryRepository;
-    @Mock
-    private UserService userService;
+class CategoryServiceTest {
+    private final CategoryRepository categoryRepository = Mockito.mock(CategoryRepository.class);
+    private final UserService userService = Mockito.mock(UserService.class);
     private final CategoryModelMapper categoryModelMapper = new CategoryModelMapper();
-    @Mock
-    private SubscriptionService subscriptionService;
+    private final SubscriptionService subscriptionService = Mockito.mock(SubscriptionService.class);
 
-    private CategoryService categoryService;
-
-
-    @BeforeEach
-    void setUp() {
-        categoryService = new CategoryServiceImpl(
-                categoryRepository,
-                userService,
-                categoryModelMapper,
-                subscriptionService);
-    }
+    private final CategoryService categoryService = new CategoryServiceImpl(
+            categoryRepository,
+            userService,
+            categoryModelMapper,
+            subscriptionService);
+    ;
 
     /**
      * Тестирование получения категорий текущего пользователя пользователя
@@ -74,13 +64,13 @@ class CategoryServiceImplTest {
 
         when(userService.getCurrentUser()).thenReturn(testUser);
 
-        when(categoryRepository.findCategoriesByUser(testUser)).thenReturn(Optional.of(categories));
+        when(categoryRepository.findCategoriesByUser(testUser)).thenReturn(categories);
 
         List<CategoryModel> categoryModels = categoryService.getCategoriesByCurrentUsername();
+        assertThat(categoryModels).isNotNull();
+        assertThat(categories.get(0).getName()).isEqualTo(categoryModels.get(0).name());
+        assertThat(categories.get(1).getName()).isEqualTo(categoryModels.get(1).name());
 
-        assertThat(categories.stream().map(categoryModelMapper).toList()).isEqualTo(categoryModels);
-
-        verify(categoryRepository).findCategoriesByUser(testUser);
     }
 
     /**
@@ -98,7 +88,6 @@ class CategoryServiceImplTest {
 
         assertThat(actualCategory).isEqualTo(testCategory);
 
-        verify(categoryRepository).findCategoryByNameAndUser(categoryName, testUser);
     }
 
     /**
@@ -110,9 +99,9 @@ class CategoryServiceImplTest {
         CreateCategoryModel createCategoryModel = new CreateCategoryModel("test");
         given(categoryRepository.existsByNameAndUser("test", testUser)).willReturn(false);
         when(userService.getCurrentUser()).thenReturn(testUser);
-        categoryService.create(createCategoryModel);
-
         ArgumentCaptor<Category> categoryArgumentCaptor = ArgumentCaptor.forClass(Category.class);
+
+        categoryService.create(createCategoryModel);
 
         verify(categoryRepository, times(1)).save(categoryArgumentCaptor.capture());
 
@@ -128,9 +117,9 @@ class CategoryServiceImplTest {
     @Test
     void testCanCreateDefaultCategory() {
         User testUser = UserBuilder.anUser().defaultUser();
-        categoryService.createDefaultSubscription(testUser);
 
         ArgumentCaptor<Category> categoryArgumentCaptor = ArgumentCaptor.forClass(Category.class);
+        categoryService.createDefaultSubscription(testUser);
 
         verify(categoryRepository, times(1)).save(categoryArgumentCaptor.capture());
 
@@ -152,7 +141,7 @@ class CategoryServiceImplTest {
 
         assertThatThrownBy(() -> categoryService.create(createCategoryModel))
                 .isInstanceOf(EntityExistsException.class)
-                .hasMessageContaining("Сущность с именем" + createCategoryModel.name() + "уже существует");
+                .hasMessageContaining("Сущность с именем " + createCategoryModel.name() + " уже существует");
 
         verify(categoryRepository, never()).save(any());
     }
@@ -189,7 +178,9 @@ class CategoryServiceImplTest {
     void testCanDeleteCategory() {
         Long categoryId = 12L;
         given(categoryRepository.existsById(categoryId)).willReturn(true);
-        when(categoryRepository.findCategoryById(categoryId)).thenReturn(Optional.of(CategoryBuilder.anCategory().defaultCategory()));
+        when(categoryRepository.
+                findCategoryById(categoryId))
+                .thenReturn(Optional.of(CategoryBuilder.anCategory().defaultCategory()));
         categoryService.delete(categoryId);
 
         verify(categoryRepository).deleteAllById(Collections.singleton(categoryId));

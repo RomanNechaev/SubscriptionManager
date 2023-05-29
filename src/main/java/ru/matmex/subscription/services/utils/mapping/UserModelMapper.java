@@ -5,33 +5,26 @@ import org.springframework.stereotype.Component;
 import ru.matmex.subscription.entities.User;
 import ru.matmex.subscription.models.user.UserModel;
 
-import java.util.function.Function;
-
 /**
- * Преобразование сущности пользователя в DTO
+ * Преобразование сущности пользователя в модель пользователя
  */
 @Component
-public class UserModelMapper implements Function<User, UserModel> {
+public class UserModelMapper {
     CategoryModelMapper categoryModelMapper;
     SubscriptionModelMapper subscriptionModelMapper;
 
     @Autowired
-    UserModelMapper(CategoryModelMapper categoryModelMapper, SubscriptionModelMapper subscriptionModelMapper) {
+    public UserModelMapper(CategoryModelMapper categoryModelMapper, SubscriptionModelMapper subscriptionModelMapper) {
         this.categoryModelMapper = categoryModelMapper;
         this.subscriptionModelMapper = subscriptionModelMapper;
     }
 
-    @Override
-    public UserModel apply(User user) {
+    public UserModel map(User user) {
         return new UserModel(
                 user.getId(),
                 user.getUsername(),
                 user.getCategories()
                         .stream()
-                        .map(categoryModelMapper).toList());
-    }
-
-    public UserModel build(User user) {
-        return apply(user);
+                        .map(x -> categoryModelMapper.map(x)).toList());
     }
 }

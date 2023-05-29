@@ -1,5 +1,6 @@
 package ru.matmex.subscription.services.impl.security;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,13 +27,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
     }
-
-    /**
-     * Авторизация пользователя
-     *
-     * @param authRequest авторазационные данные пользователя
-     * @return ответ, содержащий необходимую авторизационную информацию
-     */
     @Override
     public AuthResponse authUser(AuthRequest authRequest) {
         checkOnNull(authRequest);
@@ -49,7 +43,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
      * @param authRequest авторазационные данные пользователя
      */
     private void checkOnNull(AuthRequest authRequest) {
-        if (authRequest.username() == null || authRequest.username().equals("") || authRequest.password() == null || authRequest.password().equals("")) {
+        if (StringUtils.isBlank(authRequest.username()) || StringUtils.isBlank(authRequest.password())) {
             throw new IllegalArgumentException("Аргументы для входа не могут быть пустыми!");
         }
     }
