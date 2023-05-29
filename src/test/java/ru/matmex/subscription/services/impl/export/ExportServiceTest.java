@@ -60,7 +60,7 @@ class ExportServiceTest {
 
         category.setSubscriptions(List.of(sub1, sub2));
 
-        UserModel userModel = new UserModel(1L, "test", Stream.of(category).map(categoryModelMapper).toList());
+        UserModel userModel = new UserModel(1L, "test", Stream.of(category).map(categoryModelMapper::map).toList());
 
         when(userService.getCurrentUser()).thenReturn(testUser);
         when(userService.getUser(testUser.getUsername())).thenReturn(userModel);
@@ -68,13 +68,13 @@ class ExportServiceTest {
         String reportName = "TotalPriceCategory";
 
         byte[] actualCSV = csvService.loadReport(reportName);
-        byte[] expectedCSV = FileUtils.readFileToByteArray(new File("/home/romenka/subscription/src/main/resources/filesForTests/expectedResult.csv"));
+        byte[] expectedCSV = FileUtils.readFileToByteArray(new File("./src/test/java/ru/matmex/subscription/resources/expectedResult.csv"));
 
         byte[] actualJSON = jsonService.loadReport(reportName);
-        byte[] expectedJSON = FileUtils.readFileToByteArray(new File("/home/romenka/subscription/src/main/resources/filesForTests/expectedResult.json"));
+        byte[] expectedJSON = FileUtils.readFileToByteArray(new File("./src/test/java/ru/matmex/subscription/resources/expectedResult.json"));
 
         byte[] actualPDF = pdfService.loadReport(reportName);
-        //byte[] expectedPDF = FileUtils.readFileToByteArray(new File("/home/romenka/subscription/src/main/resources/filesForTests/expectedResult.pdf"));
+        //byte[] expectedPDF = FileUtils.readFileToByteArray(new File("./src/test/java/ru/matmex/subscription/resources/expectedResult.pdf"));
 
         assertThat(actualCSV).isEqualTo(expectedCSV);
         assertThat(actualJSON).isEqualTo(expectedJSON);
