@@ -1,10 +1,13 @@
 package ru.matmex.subscription.services;
 
+/**
+ * Сервис для экспорта различных отчетов
+ */
 public interface ExportReportService {
     /**
-     * Загрузить отчет
-     * @param nameReport - имя отчета
-     * @return отчет в виде массива байт
+     * Загрузка отчета
+     *
+     * @param nameReport название отчета
      */
     byte[] loadReport(String nameReport);
 }

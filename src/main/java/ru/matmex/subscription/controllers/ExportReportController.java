@@ -1,7 +1,7 @@
 package ru.matmex.subscription.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -13,8 +13,6 @@ import ru.matmex.subscription.services.ExportReportService;
 import ru.matmex.subscription.services.impl.export.CSVService;
 import ru.matmex.subscription.services.impl.export.JSONService;
 import ru.matmex.subscription.services.impl.export.PDFService;
-
-import java.io.ByteArrayInputStream;
 
 @Controller
 public class ExportReportController {
@@ -40,7 +38,7 @@ public class ExportReportController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
                 .contentType(MediaType.parseMediaType("application/csv"))
-                .body(new InputStreamResource(new ByteArrayInputStream(csvService.loadReport(name))));
+                .body(new ByteArrayResource(csvService.loadReport(name)));
     }
 
     /**
@@ -50,7 +48,7 @@ public class ExportReportController {
      */
     @GetMapping(value = "/api/app/exportJSON/{name}")
     public ResponseEntity<Resource> exportJSON(@PathVariable String name) {
-        return ResponseEntity.ok(new InputStreamResource(new ByteArrayInputStream(jsonService.loadReport(name))));
+        return ResponseEntity.ok(new ByteArrayResource(jsonService.loadReport(name)));
     }
 
     /**
@@ -64,6 +62,6 @@ public class ExportReportController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
                 .contentType(MediaType.parseMediaType("application/csv"))
-                .body(new InputStreamResource(new ByteArrayInputStream(pdfService.loadReport(name))));
+                .body(new ByteArrayResource(pdfService.loadReport(name)));
     }
 }
