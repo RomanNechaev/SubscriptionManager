@@ -4,6 +4,8 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -48,5 +50,15 @@ public class ExceptionApiHandler {
     @ExceptionHandler(EntityExistsException.class)
     public ResponseEntity<ErrorMessage> entityExistsException(EntityExistsException exception) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorMessage(exception.getMessage()));
+    }
+
+    /**
+     *
+     * @param exception ошибка связнная с аутентификацией
+     * @return сообщание о том, что произошла ошибка аутентификации
+     */
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorMessage> authenticationServiceException(AuthenticationException exception) {
+        return ResponseEntity.status(HttpStatus.NETWORK_AUTHENTICATION_REQUIRED).body(new ErrorMessage(exception.getMessage()));
     }
 }
