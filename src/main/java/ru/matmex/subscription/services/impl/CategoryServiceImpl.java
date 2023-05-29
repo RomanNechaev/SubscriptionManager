@@ -28,7 +28,6 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final UserService userService;
     private final CategoryModelMapper categoryModelMapper;
-
     private final SubscriptionService subscriptionService;
 
     @Autowired
@@ -42,95 +41,57 @@ public class CategoryServiceImpl implements CategoryService {
         this.subscriptionService = subscriptionService;
     }
 
-    /**
-     * Получить категорию текущего юзера
-     *
-     * @return Список категорий текущего пользователя
-     */
     @Override
     public List<CategoryModel> getCategoriesByCurrentUsername() {
-        return categoryRepository
-                .findCategoriesByUser(userService.getCurrentUser())
-                .orElseThrow(EntityNotFoundException::new)
-                .stream().map(categoryModelMapper)
+        List<Category> categories = categoryRepository.findCategoriesByUser(userService.getCurrentUser());
+        if (categories.isEmpty()) {
+            throw new EntityNotFoundException("Список категорий пуст!");
+        }
+        return categories
+                .stream().map(categoryModelMapper::map)
                 .toList();
     }
 
-    /**
-     * Получить категорию по имени
-     *
-     * @param name Имя категории
-     * @return категория с именем name
-     */
     @Override
     public Category getCategory(String name) {
         return categoryRepository
                 .findCategoryByNameAndUser(name, userService.getCurrentUser())
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(() -> new EntityNotFoundException("Подписка " + name + "не найдена!"));
     }
 
-    /**
-     * Преобразовать сущность категории в модель категории
-     *
-     * @param name имя категори
-     * @return модель категории
-     */
     @Override
     public CategoryModel getCategoryToClient(String name) {
-        return categoryModelMapper.apply(getCategory(name));
+        return categoryModelMapper.map(getCategory(name));
     }
 
-    /**
-     * Создать категорию
-     *
-     * @param createCategoryModel - данные, заполненные пользователем при создании категории на клиенте
-     * @return модель категории
-     */
     @Override
     public CategoryModel create(CreateCategoryModel createCategoryModel) {
         if (categoryRepository.existsByNameAndUser(createCategoryModel.name(), userService.getCurrentUser())) {
-            throw new EntityExistsException("Сущность с именем" + createCategoryModel.name() + "уже существует");
+            throw new EntityExistsException("Сущность с именем " + createCategoryModel.name() + " уже существует");
         }
         Category category = new Category(createCategoryModel.name(), new ArrayList<>(), userService.getCurrentUser());
         categoryRepository.save(category);
-        return categoryModelMapper.apply(category);
+        return categoryModelMapper.map(category);
     }
 
-    /**
-     * Создать категорию по умолчанию
-     *
-     * @param user - Сущность юзера
-     */
     @Override
     public void createDefaultSubscription(User user) {
         Category category = new Category("default", new ArrayList<>(), user);
         categoryRepository.save(category);
     }
 
-    /**
-     * Обновить категорию
-     *
-     * @param updateCategoryModel параметры, заполненные пользователем на клиенте
-     * @return модель категории
-     */
     @Override
     public CategoryModel update(UpdateCategoryModel updateCategoryModel) {
         Category category = categoryRepository
                 .findCategoryById(updateCategoryModel.id())
-                .orElseThrow(EntityNotFoundException::new);//TODO
+                .orElseThrow(EntityNotFoundException::new);
         category.setName(updateCategoryModel.name());
         categoryRepository.save(category);
-        return categoryModelMapper.apply(category);
+        return categoryModelMapper.map(category);
     }
 
-    /**
-     * Удалить категорию
-     *
-     * @param id - индетификатор категории в БД
-     * @return Сообщение об успешном удалении, в случае если не произошла ошибка
-     */
     @Override
-    public String delete(Long id) {
+    public String delete(Long id) throws EntityNotFoundException {
         if (categoryRepository.existsById(id)) {
             categoryRepository
                     .findCategoryById(id).orElseThrow().getSubscriptions()

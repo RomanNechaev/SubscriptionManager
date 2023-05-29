@@ -1,6 +1,8 @@
 package ru.matmex.subscription.services.impl;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.matmex.subscription.entities.Category;
@@ -14,11 +16,13 @@ import ru.matmex.subscription.repositories.SubscriptionRepository;
 import ru.matmex.subscription.services.CategoryService;
 import ru.matmex.subscription.services.SubscriptionService;
 import ru.matmex.subscription.services.UserService;
-import ru.matmex.subscription.services.utils.Parser;
 import ru.matmex.subscription.services.utils.mapping.SubscriptionModelMapper;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -31,6 +35,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final UserService userService;
     private final SubscriptionModelMapper subscriptionModelMapper;
     private final CategoryRepository categoryRepository;
+    private static final SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
+    private static final Logger logger = LoggerFactory.getLogger(SubscriptionServiceImpl.class);
 
     @Autowired
     public SubscriptionServiceImpl(SubscriptionRepository subscriptionRepository, SubscriptionModelMapper subscriptionModelMapper,
@@ -43,41 +49,26 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         this.categoryRepository = categoryRepository;
     }
 
-    /**
-     * Получить спиоск всех подписок текущего пользователя
-     *
-     * @return список всех подписок текущего пользователя
-     */
     @Override
     public List<SubscriptionModel> getSubscriptions() {
         return getSubscriptionsByUser(userService.getCurrentUser())
                 .stream()
-                .map(subscriptionModelMapper)
+                .map(subscriptionModelMapper::map)
                 .toList();
     }
 
-    /**
-     * Получить список подписок определенного пользователя
-     *
-     * @param user - сущность пользователя
-     * @return список подписок
-     */
     public List<Subscription> getSubscriptionsByUser(User user) {
-        return categoryRepository
-                .findCategoriesByUser(user)
-                .orElseThrow(EntityNotFoundException::new)
+        List<Category> categories = categoryRepository.findCategoriesByUser(userService.getCurrentUser());
+        if (categories.isEmpty()) {
+            throw new EntityNotFoundException("Список категорий пуст!");
+        }
+        return categories
                 .stream().map(Category::getSubscriptions)
                 .flatMap(Collection::stream)
                 .toList();
 
     }
 
-    /**
-     * Получить подписку
-     *
-     * @param name имя подписки
-     * @return модель подписки
-     */
     public SubscriptionModel getSubscription(String name) {
         return getSubscriptions()
                 .stream()
@@ -86,34 +77,28 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 .orElseThrow(() -> new EntityNotFoundException("нет подписки с таким названием!"));
     }
 
-    /**
-     * Создать подписку
-     *
-     * @param createSubscriptionModel данные, заполненные пользователем при создании подписки на клиенте
-     * @return модель подписки
-     */
     @Override
     public SubscriptionModel createSubscription(CreateSubscriptionModel createSubscriptionModel) {
         Category category = categoryService.getCategory(createSubscriptionModel.category());
-        Subscription subscription = new Subscription(
-                createSubscriptionModel.name(),
-                createSubscriptionModel.price(),
-                Parser.parseToDate(createSubscriptionModel.paymentDate()),
-                category,
-                userService.getCurrentUser()
-        );
+        Subscription subscription;
+        try {
+            subscription = new Subscription(
+                    createSubscriptionModel.name(),
+                    createSubscriptionModel.price(),
+                    formatter.parse(createSubscriptionModel.paymentDate()),
+                    category,
+                    userService.getCurrentUser()
+            );
+        } catch (ParseException e) {
+            logger.error("Ошибка преобразования даты!");
+            throw new RuntimeException(e);
+        }
         subscriptionRepository.save(subscription);
-        return subscriptionModelMapper.build(subscription);
+        return subscriptionModelMapper.map(subscription);
     }
 
-    /**
-     * Удалить подписку
-     *
-     * @param id - индефикатор подписки в БД
-     * @return сообщение об успешном удалении
-     */
     @Override
-    public String deleteSubscription(Long id) {
+    public String deleteSubscription(Long id) throws EntityNotFoundException {
         if (subscriptionRepository.existsById(id)) {
             subscriptionRepository.deleteById(id);
             return "Подписка успешна удалена!";
@@ -122,12 +107,6 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         }
     }
 
-    /**
-     * Обновить подписку
-     *
-     * @param updateSubscriptionModel - параметры, заполненные пользователем на клиенте
-     * @return модель подписки
-     */
     @Override
     public SubscriptionModel updateSubscription(UpdateSubscriptionModel updateSubscriptionModel) {
         Subscription subscription = subscriptionRepository
@@ -136,8 +115,13 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         subscription.setCategory(categoryService.getCategory(updateSubscriptionModel.category()));
         subscription.setName(updateSubscriptionModel.name());
         subscription.setPrice(updateSubscriptionModel.price());
-        subscription.setPaymentDate(Parser.parseToDate(updateSubscriptionModel.paymentDate()));
+        try {
+            subscription.setPaymentDate(formatter.parse(updateSubscriptionModel.paymentDate()));
+        } catch (ParseException e) {
+            logger.error("Ошибка преобразования даты!");
+            throw new RuntimeException(e);
+        }
         subscriptionRepository.save(subscription);
-        return subscriptionModelMapper.build(subscription);
+        return subscriptionModelMapper.map(subscription);
     }
 }
