@@ -19,9 +19,11 @@ import ru.matmex.subscription.models.user.UserUpdateModel;
 import ru.matmex.subscription.repositories.UserRepository;
 import ru.matmex.subscription.services.CategoryService;
 import ru.matmex.subscription.services.UserService;
+import ru.matmex.subscription.services.notifications.NotificationBroker;
 import ru.matmex.subscription.services.utils.mapping.UserModelMapper;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -106,9 +108,13 @@ public class UserServiceImpl implements UserService {
      * @return информация о пользователе
      */
     @Override
-    public UserModel getUser(String username) {
+    public UserModel getUserModel(String username) {
         return userModelMapper
                 .build(userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found")));
+    }
+
+    public User getUser(String username) {
+        return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     /**
@@ -174,8 +180,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String checkIntegrationWithTelegram() {
-        return getCurrentUser().getTelegramChatId() > 0 ? "Телеграмм успешно подключен" : "Телеграмм не подключен";
+    public boolean checkIntegrationWithTelegram() {
+        return Optional.ofNullable(getCurrentUser().getTelegramChatId()).isPresent();
     }
 
     /**

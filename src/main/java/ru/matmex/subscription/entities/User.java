@@ -88,7 +88,7 @@ public class User {
         return categories;
     }
 
-    public long getTelegramChatId() {
+    public Long getTelegramChatId() {
         return telegramChatId;
     }
 

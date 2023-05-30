@@ -27,6 +27,7 @@ public class UserModelMapper implements Function<User, UserModel> {
                 user.getId(),
                 user.getUsername(),
                 user.getEmail(),
+                user.getTelegramChatId(),
                 user.getCategories()
                         .stream()
                         .map(categoryModelMapper).toList());

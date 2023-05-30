@@ -1,19 +1,30 @@
 package ru.matmex.subscription.services.notifications;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+
 /**
  * Позволяет контроллерам регистировать события
  */
 public abstract class Notifiable {
+    private final NotificationBroker notificationBroker = NotificationBroker.getInstance();
+
+    /**
+     * Зарегистироваться уведомление
+     *
+     * @param message  - уведомление
+     * @param username - имя пользователя
+     */
     public void registerNotification(String message, String username) {
-        NotificationBroker.getInstance().addNotification(new Notification(message, username));
-        NotificationBroker.getInstance().notifyAllSubscriber();
+        notificationBroker.addNotification(new Notification(message, username));
+        notificationBroker.notifyAllSubscriber();
     }
 
     /**
      * Добавить рассыльщика
      */
     public void addNotificationSender(NotificationSender sender) {
-        NotificationBroker.getInstance().addNotificationSender(sender);
+        notificationBroker.addNotificationSender(sender);
     }
 
 }

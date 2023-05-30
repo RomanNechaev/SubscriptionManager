@@ -8,22 +8,19 @@ import ru.matmex.subscription.models.user.UserModel;
 import ru.matmex.subscription.models.user.UserUpdateModel;
 import ru.matmex.subscription.services.UserService;
 import ru.matmex.subscription.services.notifications.Notifiable;
-import ru.matmex.subscription.services.notifications.telegram.TelegramBot;
 
 import java.util.List;
 
 /**
- * Контроллер для операций с юзерами
+ * Контроллер для операций с пользователями
  */
 @Controller
 public class UserController extends Notifiable {
     private final UserService userService;
-    private final TelegramBot telegramBot;
 
     @Autowired
-    public UserController(UserService userService, TelegramBot telegramBot) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.telegramBot = telegramBot;
     }
 
     /**
@@ -64,9 +61,10 @@ public class UserController extends Notifiable {
      */
     @GetMapping(value = "/api/app/telegram")
     public ResponseEntity<String> checkIntegrationWithTelegram() {
-        return ResponseEntity.ok(userService.checkIntegrationWithTelegram());
+        boolean checked = userService.checkIntegrationWithTelegram();
+        String message = checked ? "Телеграмм успешно привязан!" : "телеграмм не привязан!";
+        return ResponseEntity.ok(message);
     }
-
     /**
      * Получить информацию о пользователе по имени
      *
@@ -75,7 +73,7 @@ public class UserController extends Notifiable {
      */
     @GetMapping(value = "/api/admin/app/{username}")
     public ResponseEntity<UserModel> getUserByUsername(@PathVariable String username) {
-        return ResponseEntity.ok(userService.getUser(username));
+        return ResponseEntity.ok(userService.getUserModel(username));
     }
 
     /**
@@ -86,8 +84,8 @@ public class UserController extends Notifiable {
      */
     @DeleteMapping(value = "/api/admin/app/{username}")
     public ResponseEntity<String> delete(@PathVariable String username) {
+        registerNotification("Пользователь " + username + " успешно удален", username);
         String deleted = userService.delete(username);
-        registerNotification("Пользователь " + username + "Успешно удален", username);
         return ResponseEntity.ok(deleted);
     }
 }

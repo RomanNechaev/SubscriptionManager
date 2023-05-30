@@ -2,25 +2,24 @@ package ru.matmex.subscription.services.notifications.telegram;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import ru.matmex.subscription.entities.User;
 import ru.matmex.subscription.services.UserService;
+import ru.matmex.subscription.services.impl.security.AuthenticationContext;
 import ru.matmex.subscription.services.notifications.Notification;
+import ru.matmex.subscription.services.notifications.NotificationBroker;
 import ru.matmex.subscription.services.notifications.NotificationSender;
 
-@Service
 public class TelegramBot extends TelegramLongPollingBot implements NotificationSender {
     private final BotConfig botConfig;
-    private static final Logger logger = LoggerFactory.getLogger(TelegramBot.class);
     private final UserService userService;
-    private long chatId;
-    private String currentUserName;
 
-    @Autowired
+    private final CommandHandler handler = new CommandHandler(this);
+    private static final Logger logger = LoggerFactory.getLogger(TelegramBot.class);
+
     public TelegramBot(BotConfig botConfig, UserService userService) {
         this.botConfig = botConfig;
         this.userService = userService;
@@ -31,41 +30,42 @@ public class TelegramBot extends TelegramLongPollingBot implements NotificationS
         return botConfig.getToken();
     }
 
+    /**
+     * Принимает и обрабатывает обновления состояния бота.
+     *
+     * @param update - состояние отдельного пользователя
+     */
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
             String messageText = update.getMessage().getText();
-            chatId = update.getMessage().getChatId();
-            processCommand(messageText);
-        }
-    }
-
-    /**
-     * Обработка сообщений от пользователя
-     *
-     * @param messageText - пользовательское сообщение
-     */
-    private void processCommand(String messageText) {
-        if (messageText.equals("secret")) {
-            sendMessage(chatId, "Уведомление через бота успешно привязано!");
-            userService.setTelegramChatId(currentUserName, chatId);
-        } else {
-            switch (messageText) {
-                case "/start" -> sendMessage(chatId, "Введите имя пользователя");
-                default -> {
-                    currentUserName = messageText;
-                    sendMessage(chatId, "Введите код потверждения, отправленный на почту!");
-                }
+            Long chatId = update.getMessage().getChatId();
+            User currentUser = userService.getUser(AuthenticationContext.getAuthenticationContext().getName());
+            boolean isLinked = handler.processCommand(currentUser, messageText, chatId);
+            if (isLinked) {
+                userService.setTelegramChatId(currentUser.getUsername(), chatId);
+                NotificationBroker.getInstance().addNotificationSender(this);
             }
         }
     }
 
+    /**
+     * Получить имя тг бота
+     *
+     * @return имя тг бота
+     */
     @Override
     public String getBotUsername() {
         return botConfig.getBotName();
     }
 
-    private void sendMessage(Long chatId, String textToSend) {
+    /**
+     * Отправить сообщение пользователю
+     *
+     * @param chatId     id тг чата, куда отправляется сообщение
+     * @param textToSend - текст сообщения
+     */
+    public void sendMessage(Long chatId, String textToSend) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(String.valueOf(chatId));
         sendMessage.setText(textToSend);
@@ -78,7 +78,8 @@ public class TelegramBot extends TelegramLongPollingBot implements NotificationS
 
     @Override
     public void sendNotification(Notification notification) {
-        String message = notification.getMessage() + "  Дата отправки события  " + notification.getCurrentDate();
+        String message = notification.getMessage() + "\nДата отправки события: " + notification.getCurrentDate();
+        Long chatId = userService.getUserModel(notification.getUsername()).tgId();
         sendMessage(chatId, message);
     }
 

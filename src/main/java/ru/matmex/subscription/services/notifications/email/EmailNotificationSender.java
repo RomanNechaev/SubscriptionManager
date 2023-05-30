@@ -29,12 +29,12 @@ public class EmailNotificationSender implements NotificationSender {
     @Override
     public void sendNotification(Notification notification) {
         SimpleMailMessage message = new SimpleMailMessage(this.templateMessage);
-        String userEmail = userService.getUser(notification.getUsername()).email();
+        String userEmail = userService.getUserModel(notification.getUsername()).email();
         String emailFrom = "petrlovygin@yandex.ru";
         message.setSubject("Уведомление");
         message.setFrom(emailFrom);
         message.setTo(userEmail);
-        message.setText(notification.getMessage());
+        message.setText(notification.getMessage() + "\nДата отправки события: "  + notification.getCurrentDate());
         message.setSentDate(notification.getCurrentDate());
         try {
             notificationMailSender.send(message);
