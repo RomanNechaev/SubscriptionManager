@@ -63,7 +63,7 @@ class ExportServiceTest {
         UserModel userModel = new UserModel(1L, "test", Stream.of(category).map(categoryModelMapper).toList());
 
         when(userService.getCurrentUser()).thenReturn(testUser);
-        when(userService.getUser(testUser.getUsername())).thenReturn(userModel);
+        when(userService.getUserModel(testUser.getUsername())).thenReturn(userModel);
 
         String reportName = "TotalPriceCategory";
 

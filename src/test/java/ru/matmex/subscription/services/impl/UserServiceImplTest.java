@@ -24,7 +24,6 @@ import ru.matmex.subscription.models.user.UserUpdateModel;
 import ru.matmex.subscription.repositories.UserRepository;
 import ru.matmex.subscription.services.CategoryService;
 import ru.matmex.subscription.services.UserService;
-import ru.matmex.subscription.services.notifications.email.EmailNotificationSender;
 import ru.matmex.subscription.services.utils.mapping.UserModelMapper;
 import ru.matmex.subscription.utils.UserBuilder;
 
@@ -134,7 +133,7 @@ class UserServiceImplTest {
 
         when(userRepository.findByUsername("test")).thenReturn(Optional.of(defaultUser));
 
-        UserModel user = userService.getUser("test");
+        UserModel user = userService.getUserModel("test");
 
         assertThat(userModelMapper.build(defaultUser)).isEqualTo(user);
     }
@@ -147,7 +146,7 @@ class UserServiceImplTest {
         String username = defaultUser.getUsername();
         when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> userService.getUser(username))
+        assertThatThrownBy(() -> userService.getUserModel(username))
                 .isInstanceOf(UsernameNotFoundException.class)
                 .hasMessage("User not found");
     }

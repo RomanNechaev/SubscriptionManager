@@ -28,7 +28,6 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final UserService userService;
     private final CategoryModelMapper categoryModelMapper;
-
     private final SubscriptionService subscriptionService;
 
     @Autowired
