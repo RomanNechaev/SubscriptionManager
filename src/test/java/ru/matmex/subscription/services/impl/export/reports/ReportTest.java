@@ -10,17 +10,74 @@ import ru.matmex.subscription.utils.CategoryBuilder;
 import ru.matmex.subscription.utils.SubscriptionBuilder;
 import ru.matmex.subscription.utils.UserBuilder;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-class CalculateAveragePriceCategoryTest {
+import static org.assertj.core.api.Assertions.assertThat;
 
-    CalculateAveragePriceCategory calculate = new CalculateAveragePriceCategory();
+class ReportTest {
     CategoryModelMapper categoryModelMapper = new CategoryModelMapper();
+
+
+    /**
+     * Тестрование на подсчет полной стоимости всех подписок в категории без подписок
+     */
+    @Test
+    void testCanGetTotalPriceIfCategoryDoesntHaveSubscriptions() {
+        Category category = CategoryBuilder.anCategory().defaultCategory();
+
+        UserModel userModel = new UserModel(1L, "test", Stream.of(category).map(categoryModelMapper::map).toList());
+
+        double totalPrice = Report.TotalPriceCategory.calculate(userModel).get(category.getName());
+
+        assertThat(totalPrice).isEqualTo(0.0);
+    }
+
+    /**
+     * Тестирование возможности подсчета полной стоимости всех подписок, если у пользователя нет категорий и подписок соответсвенно
+     */
+    @Test
+    void testCanGetTotalPriceIfUserDoesntHaveCategories() {
+        UserModel userModel = new UserModel(1L, "test", new ArrayList<>());
+
+        Map<String, Double> result = Report.TotalPriceCategory.calculate(userModel);
+
+        assertThat(result).isEmpty();
+    }
+
+    /**
+     * Тестирование на корректность подсчета полной стоимости всех подписок в категории
+     */
+    @Test
+    void testCanCorrectGetTotalPrice() {
+        User testUser = UserBuilder.anUser().defaultUser();
+
+        Category category = CategoryBuilder.anCategory().defaultCategory();
+
+        Subscription sub1 = SubscriptionBuilder.anSubscription()
+                .withName("test")
+                .withUser(testUser)
+                .withPrice(100.0)
+                .withCategory(category)
+                .build();
+
+        Subscription sub2 = SubscriptionBuilder.anSubscription()
+                .withName("test2")
+                .withUser(testUser)
+                .withPrice(200.0)
+                .withCategory(category)
+                .build();
+
+        category.setSubscriptions(List.of(sub1,sub2));
+
+        UserModel userModel = new UserModel(1L, "test", Stream.of(category).map(categoryModelMapper::map).toList());
+
+        double averagePrice = Report.TotalPriceCategory.calculate(userModel).get(category.getName());
+
+        assertThat(averagePrice).isEqualTo(300.0);
+    }
 
     /**
      * Тестрование на подсчет средней цены всех подписок в категории без подписок
@@ -31,7 +88,7 @@ class CalculateAveragePriceCategoryTest {
 
         UserModel userModel = new UserModel(1L, "test", Stream.of(category).map(categoryModelMapper::map).toList());
 
-        double averagePrice = calculate.apply(userModel).get(category.getName());
+        double averagePrice = Report.AveragePriceCategory.calculate(userModel).get(category.getName());
 
         assertThat(averagePrice).isEqualTo(0.0);
     }
@@ -43,7 +100,7 @@ class CalculateAveragePriceCategoryTest {
     void testCanGetAveragePriceIfUserDoesntHaveCategories() {
         UserModel userModel = new UserModel(1L, "test", new ArrayList<>());
 
-        Map<String, Double> result = calculate.apply(userModel);
+        Map<String, Double> result = Report.AveragePriceCategory.calculate(userModel);
 
         assertThat(result).isEmpty();
     }
@@ -75,8 +132,9 @@ class CalculateAveragePriceCategoryTest {
 
         UserModel userModel = new UserModel(1L, "test", Stream.of(category).map(categoryModelMapper::map).toList());
 
-        double averagePrice = calculate.apply(userModel).get(category.getName());
+        double averagePrice = Report.AveragePriceCategory.calculate(userModel).get(category.getName());
 
         assertThat(averagePrice).isEqualTo(150.0);
     }
+
 }
