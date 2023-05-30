@@ -11,7 +11,7 @@ import ru.matmex.subscription.services.UserService;
 import java.util.List;
 
 /**
- * Контроллер для операций с юзерами
+ * Контроллер для операций с пользователем
  */
 @Controller
 public class UserController {

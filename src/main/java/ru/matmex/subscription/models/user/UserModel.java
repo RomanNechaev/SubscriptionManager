@@ -4,6 +4,12 @@ import ru.matmex.subscription.models.category.CategoryModel;
 
 import java.util.List;
 
+/**
+ * Модель пользователя. Хранит только доступные данные для клиента.
+ * @param id - идентификатор пользователя в БД
+ * @param username - имя пользователя
+ * @param categories - список категорий
+ */
 public record UserModel(Long id, String username,
                         List<CategoryModel> categories) {
 }
