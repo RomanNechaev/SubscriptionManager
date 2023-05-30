@@ -24,6 +24,7 @@ import ru.matmex.subscription.models.user.UserUpdateModel;
 import ru.matmex.subscription.repositories.UserRepository;
 import ru.matmex.subscription.services.CategoryService;
 import ru.matmex.subscription.services.UserService;
+import ru.matmex.subscription.services.notifications.email.EmailNotificationSender;
 import ru.matmex.subscription.services.utils.mapping.UserModelMapper;
 import ru.matmex.subscription.utils.UserBuilder;
 
@@ -44,6 +45,8 @@ class UserServiceImplTest {
     private PasswordEncoder passwordEncoder;
     @Mock
     private UserModelMapper userModelMapper;
+    @Mock
+    private EmailNotificationSender sender;
 
     private UserService userService;
 
@@ -55,7 +58,8 @@ class UserServiceImplTest {
                 userRepository,
                 passwordEncoder,
                 userModelMapper,
-                categoryService);
+                categoryService,
+                sender);
     }
 
     /**

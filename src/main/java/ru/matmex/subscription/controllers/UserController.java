@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.matmex.subscription.models.user.UserModel;
 import ru.matmex.subscription.models.user.UserUpdateModel;
 import ru.matmex.subscription.services.UserService;
-import ru.matmex.subscription.services.notifications.Notifiable;
 
 import java.util.List;
 
@@ -15,7 +14,7 @@ import java.util.List;
  * Контроллер для операций с пользователями
  */
 @Controller
-public class UserController extends Notifiable {
+public class UserController {
     private final UserService userService;
 
     @Autowired
@@ -47,7 +46,7 @@ public class UserController extends Notifiable {
     /**
      * Оотправить сслыку-приглашение на бота-рассыльщика
      *
-     * @return
+     * @return ссылка на бота
      */
     @GetMapping(value = "/api/app/tgbot")
     public ResponseEntity<String> getInviteToTelegramBot() {
@@ -85,8 +84,6 @@ public class UserController extends Notifiable {
      */
     @DeleteMapping(value = "/api/admin/app/{username}")
     public ResponseEntity<String> delete(@PathVariable String username) {
-        registerNotification("Пользователь " + username + " успешно удален", username);
-        String deleted = userService.delete(username);
-        return ResponseEntity.ok(deleted);
+        return ResponseEntity.ok(userService.delete(username));
     }
 }

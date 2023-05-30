@@ -9,21 +9,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import ru.matmex.subscription.models.user.UserModel;
 import ru.matmex.subscription.models.user.UserRegistrationModel;
 import ru.matmex.subscription.services.UserService;
-import ru.matmex.subscription.services.notifications.Notifiable;
-import ru.matmex.subscription.services.notifications.email.EmailNotificationSender;
 
 /**
  * Контроллер для регистрации пользователя
  */
 @Controller
 @CrossOrigin
-public class RegistrationController extends Notifiable {
+public class RegistrationController {
     private final UserService userService;
 
     @Autowired
-    public RegistrationController(UserService userService, EmailNotificationSender sender) {
+    public RegistrationController(UserService userService) {
         this.userService = userService;
-        addNotificationSender(sender);
     }
 
     /**
@@ -34,8 +31,6 @@ public class RegistrationController extends Notifiable {
      */
     @PostMapping("/registration")
     public ResponseEntity<UserModel> registration(@RequestBody UserRegistrationModel userRegistrationModel) {
-        UserModel userModel = userService.adduser(userRegistrationModel);
-        registerNotification("Вы успешно зарегистрировались в приложении!", userRegistrationModel.username());
-        return ResponseEntity.ok(userModel);
+        return ResponseEntity.ok(userService.adduser(userRegistrationModel));
     }
 }

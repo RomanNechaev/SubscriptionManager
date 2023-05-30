@@ -19,6 +19,8 @@ import ru.matmex.subscription.models.user.UserUpdateModel;
 import ru.matmex.subscription.repositories.UserRepository;
 import ru.matmex.subscription.services.CategoryService;
 import ru.matmex.subscription.services.UserService;
+import ru.matmex.subscription.services.notifications.Notifiable;
+import ru.matmex.subscription.services.notifications.email.EmailNotificationSender;
 import ru.matmex.subscription.services.utils.mapping.UserModelMapper;
 
 import java.util.List;
@@ -30,7 +32,7 @@ import java.util.stream.Collectors;
  * Реализация сервиса для операций с пользователем
  */
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends Notifiable implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -41,12 +43,14 @@ public class UserServiceImpl implements UserService {
     public UserServiceImpl(UserRepository userRepository,
                            PasswordEncoder passwordEncoder,
                            UserModelMapper userModelMapper,
-                           @Lazy CategoryService categoryService) {
+                           @Lazy CategoryService categoryService,
+                           @Lazy EmailNotificationSender sender) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userModelMapper = userModelMapper;
         this.categoryService = categoryService;
         createAdmin();
+        addNotificationSender(sender);
     }
 
     /**
@@ -80,6 +84,7 @@ public class UserServiceImpl implements UserService {
                 passwordEncoder.encode(userRegistrationModel.password()));
         userRepository.save(user);
         categoryService.createDefaultSubscription(user);
+        registerNotification("Вы успешно зарегистрировались в приложении!", userRegistrationModel.username());
         return userModelMapper.build(user);
     }
 
@@ -162,6 +167,7 @@ public class UserServiceImpl implements UserService {
             throw new UsernameNotFoundException("User with" + username + " not found"); //TODO
         }
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        registerNotification("Пользователь " + username + " успешно удален", username);
         userRepository.delete(user);
         return "Пользователь успешно удален!";
     }
