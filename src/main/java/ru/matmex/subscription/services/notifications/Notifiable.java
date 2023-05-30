@@ -1,8 +1,5 @@
 package ru.matmex.subscription.services.notifications;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-
 /**
  * Позволяет контроллерам регистировать события
  */

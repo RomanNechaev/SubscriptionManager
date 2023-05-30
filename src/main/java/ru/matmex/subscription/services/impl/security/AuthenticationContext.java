@@ -10,6 +10,7 @@ public class AuthenticationContext {
 
     /**
      * Получить авторизационные данные
+     *
      * @return авторизационные куки
      */
     public static synchronized Authentication getAuthenticationContext() {
@@ -18,6 +19,7 @@ public class AuthenticationContext {
 
     /**
      * Установить авторизацию
+     *
      * @param authenticationContext авторизацинные данные
      */
     public static synchronized void setAuthenticationContext(Authentication authenticationContext) {

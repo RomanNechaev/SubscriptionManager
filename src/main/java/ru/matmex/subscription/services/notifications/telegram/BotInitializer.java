@@ -25,11 +25,12 @@ public class BotInitializer {
 
     /**
      * Инициализирует бота при старте или обновлении приложения
+     *
      * @throws TelegramApiException
      */
     @EventListener({ContextRefreshedEvent.class})
     public void init() throws TelegramApiException {
-        TelegramBot telegramBot = new TelegramBot(botConfig,userService);
+        TelegramBot telegramBot = new TelegramBot(botConfig, userService);
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
         try {
             telegramBotsApi.registerBot(telegramBot);

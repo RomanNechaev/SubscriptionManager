@@ -65,6 +65,7 @@ public class UserController extends Notifiable {
         String message = checked ? "Телеграмм успешно привязан!" : "телеграмм не привязан!";
         return ResponseEntity.ok(message);
     }
+
     /**
      * Получить информацию о пользователе по имени
      *

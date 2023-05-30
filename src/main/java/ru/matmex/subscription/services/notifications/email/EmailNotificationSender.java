@@ -34,7 +34,7 @@ public class EmailNotificationSender implements NotificationSender {
         message.setSubject("Уведомление");
         message.setFrom(emailFrom);
         message.setTo(userEmail);
-        message.setText(notification.getMessage() + "\nДата отправки события: "  + notification.getCurrentDate());
+        message.setText(notification.getMessage() + "\nДата отправки события: " + notification.getCurrentDate());
         message.setSentDate(notification.getCurrentDate());
         try {
             notificationMailSender.send(message);

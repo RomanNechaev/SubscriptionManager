@@ -19,7 +19,6 @@ import ru.matmex.subscription.models.user.UserUpdateModel;
 import ru.matmex.subscription.repositories.UserRepository;
 import ru.matmex.subscription.services.CategoryService;
 import ru.matmex.subscription.services.UserService;
-import ru.matmex.subscription.services.notifications.NotificationBroker;
 import ru.matmex.subscription.services.utils.mapping.UserModelMapper;
 
 import java.util.List;
