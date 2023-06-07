@@ -28,7 +28,7 @@ class ReportTest {
     void testCanGetAveragePriceIfCategoryDoesntHaveSubscriptions() {
         Category category = CategoryBuilder.anCategory().defaultCategory();
 
-        UserModel userModel = new UserModel(1L, "test", Stream.of(category).map(categoryModelMapper).toList());
+        UserModel userModel = new UserModel(1L, "test", Stream.of(category).map(categoryModelMapper::map).toList());
         double averagePrice = Report.AveragePriceCategory.calculate(userModel).get(category.getName());
 
         assertThat(averagePrice).isEqualTo(0.0);
@@ -71,7 +71,7 @@ class ReportTest {
 
         category.setSubscriptions(List.of(sub1,sub2));
 
-        UserModel userModel = new UserModel(1L, "test", Stream.of(category).map(categoryModelMapper).toList());
+        UserModel userModel = new UserModel(1L, "test", Stream.of(category).map(categoryModelMapper::map).toList());
 
         double averagePrice = Report.AveragePriceCategory.calculate(userModel).get(category.getName());
 
@@ -86,7 +86,7 @@ class ReportTest {
     void testCanGetTotalPriceIfCategoryDoesntHaveSubscriptions() {
         Category category = CategoryBuilder.anCategory().defaultCategory();
 
-        UserModel userModel = new UserModel(1L, "test", Stream.of(category).map(categoryModelMapper).toList());
+        UserModel userModel = new UserModel(1L, "test", Stream.of(category).map(categoryModelMapper::map).toList());
 
         double totalPrice = Report.TotalPriceCategory.calculate(userModel).get(category.getName());
 
@@ -130,7 +130,7 @@ class ReportTest {
 
         category.setSubscriptions(List.of(sub1,sub2));
 
-        UserModel userModel = new UserModel(1L, "test", Stream.of(category).map(categoryModelMapper).toList());
+        UserModel userModel = new UserModel(1L, "test", Stream.of(category).map(categoryModelMapper::map).toList());
 
         double averagePrice = Report.TotalPriceCategory.calculate(userModel).get(category.getName());
 

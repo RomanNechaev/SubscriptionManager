@@ -1,7 +1,13 @@
 package ru.matmex.subscription.controllers;
 
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.calendar.Calendar;
+import com.google.api.services.calendar.CalendarScopes;
+import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.Events;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +17,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import ru.matmex.subscription.services.CalendarService;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.List;
 
 
 /**
@@ -19,7 +28,7 @@ import ru.matmex.subscription.services.CalendarService;
 @Controller
 public class GoogleServicesController {
     @Autowired
-    private CalendarService googleCalendarService;
+    private final CalendarService googleCalendarService;
     @Autowired
     public GoogleServicesController(CalendarService googleCalendarService) {
         this.googleCalendarService = googleCalendarService;
@@ -29,28 +38,9 @@ public class GoogleServicesController {
      * Перенос подпискок пользователя и их сроков действия в гугл-календарь
      */
     @RequestMapping(value = "/api/app/google/calendar")
-    public ResponseEntity<String> copySubscriptionsInCalendar(@AuthenticationPrincipal OAuth2User oAuth2User) {
-        com.google.api.services.calendar.model.Events eventList;
-        String message;
-        try {
-            CustomOAuth2User customOAuth2User = (CustomOAuth2User)oAuth2User;
-            String token = customOAuth2User.getToken();
-            GoogleCredential credential = new GoogleCredential().setAccessToken(token);
-
-
-            httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-            Calendar service = new Calendar.Builder(httpTransport, JSON_FACTORY, credential)
-                    .setApplicationName(APPLICATION_NAME).build();
-            Events events = service.events();
-            service.
-            eventList = events.list("primary").setTimeZone("Asia/Kolkata").setTimeMin(date1).setTimeMax(date2).setQ(q).execute();
-            message = eventList.getItems().toString();
-            System.out.println("My:" + eventList.getItems());
-        } catch (Exception e) {
-
-            message = "Exception while handling OAuth2 callback (" + e.getMessage() + ")."
-                    + " Redirecting to google connection status page.";
-        }
-        return new ResponseEntity<>("", HttpStatus.OK);
+    public ResponseEntity<String> copySubscriptionsInGoogleCalendar(@AuthenticationPrincipal OAuth2User oAuth2User) {
+        googleCalendarService.copySubscriptionsInCalendar();
+        return new ResponseEntity<>("Перенос подпискок успешно совершен", HttpStatus.OK);
     }
+
 }
