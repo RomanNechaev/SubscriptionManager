@@ -42,6 +42,8 @@ public class User {
     private String password;
 
     private String email;
+    @OneToOne
+    private GoogleCredential googleCredential;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Category> categories;
 
@@ -85,6 +87,12 @@ public class User {
 
     public List<Category> getCategories() {
         return categories;
+    }
+    public GoogleCredential getGoogleCredential() {
+        return googleCredential;
+    }
+    public void setGoogleCredential(GoogleCredential googleCredential) {
+        this.googleCredential = googleCredential;
     }
 
 }

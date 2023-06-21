@@ -22,6 +22,7 @@ import ru.matmex.subscription.entities.User;
 import ru.matmex.subscription.models.user.UserModel;
 import ru.matmex.subscription.models.user.UserRegistrationModel;
 import ru.matmex.subscription.models.user.UserUpdateModel;
+import ru.matmex.subscription.repositories.CredentialRepository;
 import ru.matmex.subscription.repositories.UserRepository;
 import ru.matmex.subscription.services.CategoryService;
 import ru.matmex.subscription.services.UserService;
@@ -45,6 +46,8 @@ class UserServiceImplTest {
     private CategoryService categoryService;
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private CredentialRepository credentialRepository;
     private UserModelMapper userModelMapper = new UserModelMapper(new CategoryModelMapper(),new SubscriptionModelMapper());
 
     private UserService userService;
@@ -57,7 +60,8 @@ class UserServiceImplTest {
                 userRepository,
                 passwordEncoder,
                 userModelMapper,
-                categoryService);
+                categoryService,
+                credentialRepository);
     }
 
     /**
