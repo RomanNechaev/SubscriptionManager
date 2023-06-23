@@ -3,6 +3,9 @@ package ru.matmex.subscription.services.notifications.telegram;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Конфигурация телеграмм бота
+ */
 @Configuration
 public class BotConfig {
     @Value("${bot.name}")

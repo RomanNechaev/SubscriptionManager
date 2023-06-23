@@ -6,23 +6,27 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import ru.matmex.subscription.entities.User;
+import ru.matmex.subscription.models.security.Crypto;
 import ru.matmex.subscription.services.UserService;
-import ru.matmex.subscription.services.impl.security.AuthenticationContext;
 import ru.matmex.subscription.services.notifications.Notification;
 import ru.matmex.subscription.services.notifications.NotificationBroker;
 import ru.matmex.subscription.services.notifications.NotificationSender;
 
-public class TelegramBot extends TelegramLongPollingBot implements NotificationSender {
+/**
+ * Телеграмм бот для оповещений об изменениях в приложение
+ */
+public class TelegramBot extends TelegramLongPollingBot implements NotificationSender, Bot {
     private final BotConfig botConfig;
     private final UserService userService;
-
+    private final Crypto crypto;
     private final CommandHandler handler = new CommandHandler(this);
     private static final Logger logger = LoggerFactory.getLogger(TelegramBot.class);
 
-    public TelegramBot(BotConfig botConfig, UserService userService) {
+    public TelegramBot(BotConfig botConfig, UserService userService, Crypto crypto) {
         this.botConfig = botConfig;
         this.userService = userService;
+        this.crypto = crypto;
+
     }
 
     @Override
@@ -40,10 +44,8 @@ public class TelegramBot extends TelegramLongPollingBot implements NotificationS
         if (update.hasMessage() && update.getMessage().hasText()) {
             String messageText = update.getMessage().getText();
             Long chatId = update.getMessage().getChatId();
-            User currentUser = userService.getUser(AuthenticationContext.getAuthenticationContext().getName());
-            boolean isLinked = handler.processCommand(currentUser, messageText, chatId);
+            boolean isLinked = handler.processCommand(messageText, chatId, userService, crypto);
             if (isLinked) {
-                userService.setTelegramChatId(currentUser.getUsername(), chatId);
                 NotificationBroker.getInstance().addNotificationSender(this);
             }
         }
@@ -51,7 +53,6 @@ public class TelegramBot extends TelegramLongPollingBot implements NotificationS
 
     /**
      * Получить имя тг бота
-     *
      * @return имя тг бота
      */
     @Override
@@ -81,6 +82,7 @@ public class TelegramBot extends TelegramLongPollingBot implements NotificationS
         String message = notification.getMessage() + "\nДата отправки события: " + notification.getCurrentDate();
         Long chatId = userService.getUserModel(notification.getUsername()).tgId();
         sendMessage(chatId, message);
+        sendMessage(123L, "123");
     }
 
 }
