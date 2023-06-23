@@ -12,19 +12,22 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.matmex.subscription.entities.User;
+import ru.matmex.subscription.models.security.Crypto;
 import ru.matmex.subscription.models.user.Role;
 import ru.matmex.subscription.models.user.UserModel;
 import ru.matmex.subscription.models.user.UserRegistrationModel;
 import ru.matmex.subscription.models.user.UserUpdateModel;
 import ru.matmex.subscription.repositories.UserRepository;
-import ru.matmex.subscription.services.CategoryService;
 import ru.matmex.subscription.services.UserService;
 import ru.matmex.subscription.services.notifications.Notifiable;
+import ru.matmex.subscription.services.notifications.NotificationSender;
 import ru.matmex.subscription.services.notifications.email.EmailNotificationSender;
 import ru.matmex.subscription.services.utils.mapping.UserModelMapper;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -37,20 +40,20 @@ public class UserServiceImpl extends Notifiable implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserModelMapper userModelMapper;
-    private final CategoryService categoryService;
+    private final Crypto crypto;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
                            PasswordEncoder passwordEncoder,
                            UserModelMapper userModelMapper,
-                           @Lazy CategoryService categoryService,
-                           @Lazy EmailNotificationSender sender) {
+                           @Lazy EmailNotificationSender emailSender,
+                           Crypto crypto) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userModelMapper = userModelMapper;
-        this.categoryService = categoryService;
         createAdmin();
-        addNotificationSender(sender);
+        addNotificationSender(emailSender);
+        this.crypto = crypto;
     }
 
     /**
@@ -79,12 +82,13 @@ public class UserServiceImpl extends Notifiable implements UserService {
         if (userRepository.existsByUsername(userRegistrationModel.username())) {
             throw new AuthenticationServiceException("Пользователь с таким именем уже существует");
         }
+        String secretKey = createSecretTelegramKey();
         User user = new User(userRegistrationModel.username(),
                 userRegistrationModel.email(),
-                passwordEncoder.encode(userRegistrationModel.password()));
+                passwordEncoder.encode(userRegistrationModel.password()),
+                crypto.encrypt(secretKey.getBytes(StandardCharsets.UTF_8)));
         userRepository.save(user);
-        categoryService.createDefaultSubscription(user);
-        registerNotification("Вы успешно зарегистрировались в приложении!", userRegistrationModel.username());
+        registerNotification("Вы успешно зарегистрировались в приложении! \n Ваш секретный ключ для тг: " + secretKey, userRegistrationModel.username());
         return userModelMapper.build(user);
     }
 
@@ -117,8 +121,12 @@ public class UserServiceImpl extends Notifiable implements UserService {
                 .build(userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found")));
     }
 
-    public User getUser(String username) {
+    public User getUser(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
+    public void addNotificationSender(NotificationSender sender) {
+        addNotificationSender(sender);
     }
 
     /**
@@ -155,6 +163,16 @@ public class UserServiceImpl extends Notifiable implements UserService {
         userRepository.save(user);
     }
 
+    private String createSecretTelegramKey() {
+        Random r = new Random();
+        StringBuilder sb = new StringBuilder();
+        int length = 16;
+        while (sb.length() < length) {
+            sb.append(Integer.toHexString(r.nextInt()));
+        }
+        return sb.toString();
+    }
+
     /**
      * Удалить пользователя
      *
@@ -167,8 +185,9 @@ public class UserServiceImpl extends Notifiable implements UserService {
             throw new UsernameNotFoundException("User with" + username + " not found"); //TODO
         }
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        registerNotification("Пользователь " + username + " успешно удален", username);
         userRepository.delete(user);
+        registerNotification("Пользователь " + username + " успешно удален", username);
+        //TODO передать юзера
         return "Пользователь успешно удален!";
     }
 
