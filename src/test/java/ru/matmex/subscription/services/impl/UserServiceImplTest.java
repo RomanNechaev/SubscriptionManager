@@ -18,11 +18,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import ru.matmex.subscription.entities.User;
+import ru.matmex.subscription.models.security.Crypto;
 import ru.matmex.subscription.models.user.UserModel;
 import ru.matmex.subscription.models.user.UserRegistrationModel;
 import ru.matmex.subscription.models.user.UserUpdateModel;
 import ru.matmex.subscription.repositories.UserRepository;
-import ru.matmex.subscription.services.CategoryService;
 import ru.matmex.subscription.services.UserService;
 import ru.matmex.subscription.services.notifications.email.EmailNotificationSender;
 import ru.matmex.subscription.services.utils.mapping.UserModelMapper;
@@ -40,13 +40,14 @@ class UserServiceImplTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private CategoryService categoryService;
-    @Mock
     private PasswordEncoder passwordEncoder;
     @Mock
     private UserModelMapper userModelMapper;
     @Mock
     private EmailNotificationSender sender;
+
+    @Mock
+    private Crypto crypto;
 
     private UserService userService;
 
@@ -58,8 +59,8 @@ class UserServiceImplTest {
                 userRepository,
                 passwordEncoder,
                 userModelMapper,
-                categoryService,
-                sender);
+                sender,
+                crypto);
     }
 
     /**
@@ -118,7 +119,7 @@ class UserServiceImplTest {
         String newEmail = "test@yandex.ru";
         UserUpdateModel userUpdateModel = new UserUpdateModel(12L, "test", newEmail);
         String oldEmail = "test@gmail.com";
-        User user = new User("test", oldEmail, "123");
+        User user = new User("test", oldEmail, "123", "123".getBytes());
 
         when(userRepository.getById(12L)).thenReturn(Optional.of(user));
 

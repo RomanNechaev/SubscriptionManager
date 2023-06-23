@@ -29,7 +29,7 @@ class CalculateAveragePriceCategoryTest {
     void testCanGetAveragePriceIfCategoryDoesntHaveSubscriptions() {
         Category category = CategoryBuilder.anCategory().defaultCategory();
 
-        UserModel userModel = new UserModel(1L, "test", Stream.of(category).map(categoryModelMapper).toList());
+        UserModel userModel = new UserModel(1L, "test","test@gmail.com",2L, Stream.of(category).map(categoryModelMapper).toList());
 
         double averagePrice = calculate.apply(userModel).get(category.getName());
 
@@ -41,7 +41,7 @@ class CalculateAveragePriceCategoryTest {
      */
     @Test
     void testCanGetAveragePriceIfUserDoesntHaveCategories() {
-        UserModel userModel = new UserModel(1L, "test", new ArrayList<>());
+        UserModel userModel = new UserModel(1L, "test","test@gmail.com",2L, new ArrayList<>());
 
         Map<String, Double> result = calculate.apply(userModel);
 
@@ -73,7 +73,7 @@ class CalculateAveragePriceCategoryTest {
 
         category.setSubscriptions(List.of(sub1,sub2));
 
-        UserModel userModel = new UserModel(1L, "test", Stream.of(category).map(categoryModelMapper).toList());
+        UserModel userModel = new UserModel(1L, "test","test@gmail.com",2L, Stream.of(category).map(categoryModelMapper).toList());
 
         double averagePrice = calculate.apply(userModel).get(category.getName());
 

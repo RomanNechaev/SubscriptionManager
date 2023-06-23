@@ -30,7 +30,6 @@ import static org.mockito.Mockito.*;
 class ExportServiceTest {
     private final UserService userService = Mockito.mock(UserService.class);
     private final CategoryModelMapper categoryModelMapper = new CategoryModelMapper();
-
     private final ExportReportService csvService = new CSVService(userService);
     private final ExportReportService pdfService = new PDFService(userService);
     private final ExportReportService jsonService = new JSONService(userService);
@@ -60,7 +59,7 @@ class ExportServiceTest {
 
         category.setSubscriptions(List.of(sub1, sub2));
 
-        UserModel userModel = new UserModel(1L, "test", Stream.of(category).map(categoryModelMapper).toList());
+        UserModel userModel = new UserModel(1L, "test","test@gmail.com",2L, Stream.of(category).map(categoryModelMapper).toList());
 
         when(userService.getCurrentUser()).thenReturn(testUser);
         when(userService.getUserModel(testUser.getUsername())).thenReturn(userModel);
