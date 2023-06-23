@@ -2,8 +2,8 @@ package ru.matmex.subscription.services;
 
 import com.google.api.client.auth.oauth2.Credential;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import ru.matmex.subscription.entities.User;
 import ru.matmex.subscription.entities.GoogleCredential;
+import ru.matmex.subscription.entities.User;
 import ru.matmex.subscription.models.user.UserModel;
 import ru.matmex.subscription.models.user.UserRegistrationModel;
 import ru.matmex.subscription.models.user.UserUpdateModel;
@@ -60,9 +60,16 @@ public interface UserService extends UserDetailsService {
     List<UserModel> getUsers();
 
     /**
-     * Получить реквизиты для входа в гугл аккаунт
+     * Получить реквизиты для входа в гугл аккаунт текущего пользователя
      */
     GoogleCredential getGoogleCredential() throws IOException;
+
+    /**
+     * Получить реквизиты для входа в гугл аккаунт
+     *
+     * @param username - имя пользователя
+     */
+    GoogleCredential getGoogleCredential(String username) throws IOException;
 
     /**
      * Присвоить текущему пользователю реквизиты для входа в гугл аккаунт

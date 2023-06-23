@@ -142,7 +142,14 @@ public class UserServiceImpl implements UserService {
         User currentUser = getCurrentUser();
         return currentUser.getGoogleCredential();
     }
-
+    @Override
+    public GoogleCredential getGoogleCredential(String username) {
+        User user = userRepository
+                .findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User with name:" + username + "not found"));
+        return user.getGoogleCredential();
+    }
+    @Override
     public void setGoogleCredential(Credential credential) {
         User currentUser = getCurrentUser();
         GoogleCredential newCredential = new GoogleCredential(credential.getAccessToken(), credential.getExpirationTimeMilliseconds(), credential.getRefreshToken());
