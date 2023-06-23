@@ -1,11 +1,10 @@
 package ru.matmex.subscription.services.notifications;
 
 /**
- * Позволяет контроллерам регистировать события
+ * Регистратор событий
  */
 public abstract class Notifiable {
     private final NotificationBroker notificationBroker = NotificationBroker.getInstance();
-
     /**
      * Зарегистироваться уведомление
      *
@@ -16,7 +15,6 @@ public abstract class Notifiable {
         notificationBroker.addNotification(new Notification(message, username));
         notificationBroker.notifyAllSubscriber();
     }
-
     /**
      * Добавить рассыльщика
      */

@@ -1,5 +1,4 @@
 package ru.matmex.subscription.services.notifications;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -47,15 +46,15 @@ public class NotificationBroker {
      *
      * @return уведомление
      */
-    private Notification getLastNotification() {
+    private Notification getNotification() {
         return notifications.poll();
     }
 
     /**
-     * Отправить уведомление всем рассыльщикам
+     * Уведомить всех рассыльщиков
      */
     public synchronized void notifyAllSubscriber() {
-        Notification lastNotification = getLastNotification();
+        Notification lastNotification = getNotification();
         for (NotificationSender sender : notificationSenderList) {
             sender.sendNotification(lastNotification);
         }
@@ -75,7 +74,7 @@ public class NotificationBroker {
      *
      * @param sender - рассыльщик уведомлений
      */
-    private void removeNotificationSender(NotificationSender sender) {
+    public void removeNotificationSender(NotificationSender sender) {
         notificationSenderList.remove(sender);
     }
 }
