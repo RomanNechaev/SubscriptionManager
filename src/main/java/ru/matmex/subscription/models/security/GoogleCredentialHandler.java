@@ -54,11 +54,11 @@ public class GoogleCredentialHandler {
      * @return валидные учетные данные пользователя
      */
     public Credential loadCredential(GoogleCredential credential) {
-        Credential credential1 = newCredential();
-        credential1.setAccessToken(credential.getAccessToken());
-        credential1.setRefreshToken(credential.getRefreshToken());
-        credential1.setExpirationTimeMilliseconds(credential.getExpirationTimeMilliseconds());
-        return credential1;
+        Credential validCredential = newCredential();
+        validCredential.setAccessToken(credential.getAccessToken());
+        validCredential.setRefreshToken(credential.getRefreshToken());
+        validCredential.setExpirationTimeMilliseconds(credential.getExpirationTimeMilliseconds());
+        return validCredential;
     }
 
     /**

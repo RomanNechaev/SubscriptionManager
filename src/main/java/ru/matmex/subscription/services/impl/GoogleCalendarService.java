@@ -15,10 +15,14 @@ import ru.matmex.subscription.models.subscription.SubscriptionModel;
 import ru.matmex.subscription.services.CalendarService;
 import ru.matmex.subscription.services.GoogleAuthorizationService;
 import ru.matmex.subscription.services.SubscriptionService;
+import ru.matmex.subscription.services.utils.GoogleUtils;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.TimeZone;
 
 @Service
 public class GoogleCalendarService implements CalendarService {
@@ -26,6 +30,7 @@ public class GoogleCalendarService implements CalendarService {
     private static final JacksonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final Logger logger = LoggerFactory.getLogger(GoogleCalendarService.class);
     private final GoogleAuthorizationService googleAuthorizationService;
+    private final GoogleUtils googleUtils = new GoogleUtils();
 
     @Autowired
     public GoogleCalendarService(SubscriptionService subscriptionService, GoogleAuthorizationService googleAuthorizationService) {
@@ -43,34 +48,33 @@ public class GoogleCalendarService implements CalendarService {
     @Override
     public void copySubscriptionsInCalendar() {
         try {
-            insertSubscriptionInCalendar(getCalendar(), subscriptionService.getSubscriptions());
+            insertSubscriptionsInCalendar(getCalendar(), subscriptionService.getSubscriptions());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void insertSubscriptionInCalendar(Calendar calendar, List<SubscriptionModel> subscriptions) throws IOException {
+    /**
+     * Вставка в гугл-календарь подписок пользователя,
+     * если какая-то подписка уже имеется в календаря, то она не вставляется.
+     */
+    private void insertSubscriptionsInCalendar(Calendar calendar, List<SubscriptionModel> subscriptions) throws IOException {
         List<Event> events = calendar.events().list(CALENDAR_ID).execute().getItems();
         for (SubscriptionModel subscription : subscriptions) {
             if (events.stream().noneMatch(event -> Objects.equals(event.getSummary(), subscription.name()))) {
-                Event event = new Event();
-                event.setSummary(subscription.name());
-                Date startDate = new Date(subscription.paymentDate().getTime() + 123);
-                Date endDate = new Date(startDate.getTime() + 86400000);
-                DateTime start = new DateTime(startDate, TimeZone.getTimeZone("UTC"));
-                DateTime end = new DateTime(endDate, TimeZone.getTimeZone("UTC"));
-                event.setStart(new EventDateTime().setDateTime(start));
-                event.setEnd(new EventDateTime().setDateTime(end));
+                Event newEvent = googleUtils.subscriptionFormationAsEvents(subscription);
                 try {
-                    calendar.events().insert(CALENDAR_ID, event).execute();
+                    calendar.events().insert(CALENDAR_ID, newEvent).execute();
                 } catch (IOException e) {
-                    e.printStackTrace();
-                    System.out.println(e.getMessage());
+                    logger.error("Не удалось вставить подписку подписку в календарь пользователя");
+                    throw new IOException("Не получилось вставить подписку в календарь");
                 }
             }
         }
     }
-
+    /**
+     * Получение гугл-календаря пользователя
+     */
     private Calendar getCalendar() throws SocketTimeoutException {
         try {
             return new Calendar.Builder(googleAuthorizationService.getHttpTransport(),
