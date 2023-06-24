@@ -8,15 +8,11 @@ import ru.matmex.subscription.models.user.UserModel;
 /**
  * Преобразование сущности пользователя в модель пользователя
  */
-@Component
 public class UserModelMapper {
-    CategoryModelMapper categoryModelMapper;
-    SubscriptionModelMapper subscriptionModelMapper;
+    private final CategoryModelMapper categoryModelMapper;
 
-    @Autowired
-    public UserModelMapper(CategoryModelMapper categoryModelMapper, SubscriptionModelMapper subscriptionModelMapper) {
+    public UserModelMapper(CategoryModelMapper categoryModelMapper) {
         this.categoryModelMapper = categoryModelMapper;
-        this.subscriptionModelMapper = subscriptionModelMapper;
     }
 
     public UserModel map(User user) {
@@ -25,6 +21,6 @@ public class UserModelMapper {
                 user.getUsername(),
                 user.getCategories()
                         .stream()
-                        .map(x -> categoryModelMapper.map(x)).toList());
+                        .map(categoryModelMapper::map).toList());
     }
 }

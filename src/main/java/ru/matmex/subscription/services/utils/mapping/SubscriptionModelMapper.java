@@ -7,7 +7,6 @@ import ru.matmex.subscription.models.subscription.SubscriptionModel;
 /**
  * Преобразование сущности подписки в модель подписки
  */
-@Component
 public class SubscriptionModelMapper {
     public SubscriptionModel map(Subscription subscription) {
         return new SubscriptionModel(
