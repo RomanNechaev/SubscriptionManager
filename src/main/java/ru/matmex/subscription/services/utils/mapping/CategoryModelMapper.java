@@ -9,7 +9,6 @@ import java.util.Objects;
 /**
  * Преобразование сущности категории в модель категории
  */
-@Component
 public class CategoryModelMapper {
 
     public CategoryModel map(Category category) {

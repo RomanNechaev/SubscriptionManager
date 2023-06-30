@@ -1,10 +1,16 @@
 package ru.matmex.subscription.services.impl;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
+
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -23,7 +29,6 @@ import ru.matmex.subscription.repositories.UserRepository;
 import ru.matmex.subscription.services.CategoryService;
 import ru.matmex.subscription.services.UserService;
 import ru.matmex.subscription.services.utils.mapping.CategoryModelMapper;
-import ru.matmex.subscription.services.utils.mapping.SubscriptionModelMapper;
 import ru.matmex.subscription.services.utils.mapping.UserModelMapper;
 import ru.matmex.subscription.utils.UserBuilder;
 
@@ -41,30 +46,13 @@ import static org.mockito.Mockito.*;
 @ContextConfiguration(classes = {UserServiceImpl.class, PasswordEncoder.class})
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
-
-    @Mock
-    private UserRepository userRepository;
-    @Mock
-    private CategoryService categoryService;
-    @Mock
-    private PasswordEncoder passwordEncoder;
-    @Mock
-    private CredentialRepository credentialRepository;
-    private UserModelMapper userModelMapper = new UserModelMapper(new CategoryModelMapper(), new SubscriptionModelMapper());
-
-    private UserService userService;
-
+    private final UserRepository userRepository = Mockito.mock(UserRepository.class);
+    private final CategoryService categoryService  = Mockito.mock(CategoryService.class);
+    private final PasswordEncoder passwordEncoder = Mockito.mock(PasswordEncoder.class);
+    private final UserModelMapper userModelMapper = new UserModelMapper(new CategoryModelMapper());
+    private final CredentialRepository credentialRepository = Mockito.mock(CredentialRepository.class);
+    private final UserService userService = new UserServiceImpl(userRepository,passwordEncoder,userModelMapper,categoryService);
     private final User defaultUser = UserBuilder.anUser().defaultUser();
-
-    @BeforeEach
-    void setUp() {
-        userService = new UserServiceImpl(
-                userRepository,
-                passwordEncoder,
-                userModelMapper,
-                categoryService,
-                credentialRepository);
-    }
 
     /**
      * Тестирование авторизации пользователя
