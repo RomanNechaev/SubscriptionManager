@@ -19,6 +19,8 @@ public class UserModelMapper {
         return new UserModel(
                 user.getId(),
                 user.getUsername(),
+                user.getEmail(),
+                user.getTelegramChatId(),
                 user.getCategories()
                         .stream()
                         .map(categoryModelMapper::map).toList());

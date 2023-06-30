@@ -1,12 +1,13 @@
 package ru.matmex.subscription.entities;
 
 import jakarta.persistence.*;
-import ru.matmex.subscription.models.user.Role;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import ru.matmex.subscription.models.user.Role;
 
 /**
  * Сущность пользователя
@@ -17,11 +18,12 @@ public class User {
     public User() {
     }
 
-    public User(String username, String email, String password) {
+    public User(String username, String email, String password, byte[] telegramSecretKey) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.categories = new ArrayList<>();
+        this.telegramSecretKey = telegramSecretKey;
         roles.add(Role.USER);
     }
 
@@ -42,8 +44,6 @@ public class User {
     private String password;
 
     private String email;
-    @OneToOne
-    private GoogleCredential googleCredential;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Category> categories;
 
@@ -94,5 +94,15 @@ public class User {
     public void setGoogleCredential(GoogleCredential googleCredential) {
         this.googleCredential = googleCredential;
     }
+
+    public Long getTelegramChatId() {
+        return telegramChatId;
+    }
+
+    public void setTelegramChatId(long telegramChatId) {
+        this.telegramChatId = telegramChatId;
+    }
+
+    public byte[] getTelegramSecretKey() {return telegramSecretKey;}
 
 }

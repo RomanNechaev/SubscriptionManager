@@ -2,11 +2,13 @@ package ru.matmex.subscription.services;
 
 import com.google.api.client.auth.oauth2.Credential;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import ru.matmex.subscription.entities.GoogleCredential;
 import ru.matmex.subscription.entities.User;
 import ru.matmex.subscription.models.user.UserModel;
 import ru.matmex.subscription.models.user.UserRegistrationModel;
 import ru.matmex.subscription.models.user.UserUpdateModel;
+import ru.matmex.subscription.services.notifications.Notifiable;
 
 import java.io.IOException;
 import java.util.List;
@@ -35,6 +37,9 @@ public interface UserService extends UserDetailsService {
      * @return информация о пользователе
      */
     UserModel getUser(String username);
+    UserModel getUserModel(String username);
+
+    User getUser(String username) throws UsernameNotFoundException;
 
     /**
      * Получить пользователя в текущей сессии
@@ -58,6 +63,10 @@ public interface UserService extends UserDetailsService {
      * @return список всех пользователей
      */
     List<UserModel> getUsers();
+
+    boolean checkIntegrationWithTelegram();
+
+    void setTelegramChatId(String username, long telegramChatId);
 
     /**
      * Получить реквизиты для входа в гугл аккаунт текущего пользователя

@@ -3,15 +3,11 @@ package ru.matmex.subscription.services.impl;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -21,14 +17,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import ru.matmex.subscription.entities.GoogleCredential;
 import ru.matmex.subscription.entities.User;
+import ru.matmex.subscription.models.security.Crypto;
 import ru.matmex.subscription.models.user.UserModel;
 import ru.matmex.subscription.models.user.UserRegistrationModel;
 import ru.matmex.subscription.models.user.UserUpdateModel;
 import ru.matmex.subscription.repositories.CredentialRepository;
 import ru.matmex.subscription.repositories.UserRepository;
-import ru.matmex.subscription.services.CategoryService;
 import ru.matmex.subscription.services.UserService;
 import ru.matmex.subscription.services.utils.mapping.CategoryModelMapper;
+import ru.matmex.subscription.services.notifications.email.EmailNotificationSender;
 import ru.matmex.subscription.services.utils.mapping.UserModelMapper;
 import ru.matmex.subscription.utils.UserBuilder;
 
@@ -110,7 +107,7 @@ class UserServiceImplTest {
         String newEmail = "test@yandex.ru";
         UserUpdateModel userUpdateModel = new UserUpdateModel(12L, "test", newEmail);
         String oldEmail = "test@gmail.com";
-        User user = new User("test", oldEmail, "123");
+        User user = new User("test", oldEmail, "123", "123".getBytes());
 
         when(userRepository.getById(12L)).thenReturn(Optional.of(user));
 
@@ -129,7 +126,7 @@ class UserServiceImplTest {
 
         when(userRepository.findByUsername("test")).thenReturn(Optional.of(defaultUser));
 
-        UserModel user = userService.getUser("test");
+        UserModel user = userService.getUserModel("test");
 
         assertThat(userModelMapper.map(defaultUser)).isEqualTo(user);
     }
@@ -142,7 +139,7 @@ class UserServiceImplTest {
         String username = defaultUser.getUsername();
         when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> userService.getUser(username))
+        assertThatThrownBy(() -> userService.getUserModel(username))
                 .isInstanceOf(UsernameNotFoundException.class)
                 .hasMessage("User not found");
     }

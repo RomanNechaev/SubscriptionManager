@@ -14,17 +14,23 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.matmex.subscription.entities.User;
 import ru.matmex.subscription.entities.GoogleCredential;
+import ru.matmex.subscription.models.security.Crypto;
 import ru.matmex.subscription.models.user.Role;
 import ru.matmex.subscription.models.user.UserModel;
 import ru.matmex.subscription.models.user.UserRegistrationModel;
 import ru.matmex.subscription.models.user.UserUpdateModel;
 import ru.matmex.subscription.repositories.CredentialRepository;
 import ru.matmex.subscription.repositories.UserRepository;
-import ru.matmex.subscription.services.CategoryService;
 import ru.matmex.subscription.services.UserService;
+import ru.matmex.subscription.services.notifications.Notifiable;
+import ru.matmex.subscription.services.notifications.NotificationSender;
+import ru.matmex.subscription.services.notifications.email.EmailNotificationSender;
 import ru.matmex.subscription.services.utils.mapping.UserModelMapper;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,18 +38,20 @@ import java.util.stream.Collectors;
  * Реализация сервиса для операций с пользователем
  */
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends Notifiable implements UserService {
 
     private final UserRepository userRepository;
     private final CredentialRepository credentialRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserModelMapper userModelMapper;
-    private final CategoryService categoryService;
+    private final Crypto crypto;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
                            PasswordEncoder passwordEncoder,
                            UserModelMapper userModelMapper,
+                           @Lazy EmailNotificationSender emailSender,
+                           Crypto crypto,
                            @Lazy CategoryService categoryService,
                            CredentialRepository credentialRepository) {
         this.userRepository = userRepository;
@@ -52,10 +60,12 @@ public class UserServiceImpl implements UserService {
         this.categoryService = categoryService;
         this.credentialRepository = credentialRepository;
         createAdmin();
+        addNotificationSender(emailSender);
+        this.crypto = crypto;
     }
 
     /**
-     * Найти пользователя по имени
+     * Загрузить пользователя по имени
      *
      * @param username - имя пользователя
      * @return авторизовачная информация о пользователе
@@ -74,12 +84,16 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByUsername(userRegistrationModel.username())) {
             throw new AuthenticationServiceException("Пользователь с таким именем уже существует");
         }
+        String secretKey = createSecretTelegramKey();
         User user = new User(userRegistrationModel.username(),
                 userRegistrationModel.email(),
-                passwordEncoder.encode(userRegistrationModel.password()));
+                passwordEncoder.encode(userRegistrationModel.password()),
+                crypto.encrypt(secretKey.getBytes(StandardCharsets.UTF_8)));
         userRepository.save(user);
         categoryService.createDefaultSubscription(user);
         return userModelMapper.map(user);
+        registerNotification("Вы успешно зарегистрировались в приложении! \n Ваш секретный ключ для тг: " + secretKey, userRegistrationModel.username());
+        return userModelMapper.build(user);
     }
 
     @Override
@@ -94,9 +108,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserModel getUser(String username) {
+    public UserModel getUserModel(String username) {
         return userModelMapper
                 .map(userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found")));
+    }
+
+    public User getUser(String username) throws UsernameNotFoundException {
+        return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
+    public void addNotificationSender(NotificationSender sender) {
+        addNotificationSender(sender);
     }
 
     /**
@@ -120,6 +142,24 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
+    public void setTelegramChatId(String username, long telegramChatId) {
+        User user = userRepository
+                .findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        user.setTelegramChatId(telegramChatId);
+        userRepository.save(user);
+    }
+
+    private String createSecretTelegramKey() {
+        Random r = new Random();
+        StringBuilder sb = new StringBuilder();
+        int length = 16;
+        while (sb.length() < length) {
+            sb.append(Integer.toHexString(r.nextInt()));
+        }
+        return sb.toString();
+    }
+
     @Override
     public String delete(String username) {
         if (!userRepository.existsByUsername(username)) {
@@ -127,6 +167,8 @@ public class UserServiceImpl implements UserService {
         }
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         userRepository.delete(user);
+        registerNotification("Пользователь " + username + " успешно удален", username);
+        //TODO передать юзера
         return "Пользователь успешно удален!";
     }
 
@@ -160,6 +202,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public String getInformationAboutGoogle() {
         return getCurrentUser().getGoogleCredential() == null ? "гугл аккаунт не привязан" : "гугл аккаунт успешно привязан";
+    }
+
+    @Override
+    public boolean checkIntegrationWithTelegram() {
+        return Optional.ofNullable(getCurrentUser().getTelegramChatId()).isPresent();
     }
 
     /**

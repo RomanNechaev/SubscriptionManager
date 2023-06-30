@@ -10,6 +10,6 @@ import java.util.List;
  * @param username - имя пользователя
  * @param categories - список категорий
  */
-public record UserModel(Long id, String username,
+public record UserModel(Long id, String username, String email, Long tgId,
                         List<CategoryModel> categories) {
 }
