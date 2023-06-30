@@ -39,11 +39,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private static final Logger logger = LoggerFactory.getLogger(SubscriptionServiceImpl.class);
 
     @Autowired
-    public SubscriptionServiceImpl(SubscriptionRepository subscriptionRepository, SubscriptionModelMapper subscriptionModelMapper,
+    public SubscriptionServiceImpl(SubscriptionRepository subscriptionRepository,
                                    CategoryService categoryService, UserService userService,
                                    CategoryRepository categoryRepository) {
         this.subscriptionRepository = subscriptionRepository;
-        this.subscriptionModelMapper = subscriptionModelMapper;
+        this.subscriptionModelMapper = new SubscriptionModelMapper();
         this.categoryService = categoryService;
         this.userService = userService;
         this.categoryRepository = categoryRepository;

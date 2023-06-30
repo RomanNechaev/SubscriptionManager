@@ -25,6 +25,7 @@ import ru.matmex.subscription.services.UserService;
 import ru.matmex.subscription.services.notifications.Notifiable;
 import ru.matmex.subscription.services.notifications.NotificationSender;
 import ru.matmex.subscription.services.notifications.email.EmailNotificationSender;
+import ru.matmex.subscription.services.utils.mapping.CategoryModelMapper;
 import ru.matmex.subscription.services.utils.mapping.UserModelMapper;
 
 import java.nio.charset.StandardCharsets;
@@ -49,15 +50,12 @@ public class UserServiceImpl extends Notifiable implements UserService {
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
                            PasswordEncoder passwordEncoder,
-                           UserModelMapper userModelMapper,
                            @Lazy EmailNotificationSender emailSender,
                            Crypto crypto,
-                           @Lazy CategoryService categoryService,
                            CredentialRepository credentialRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.userModelMapper = userModelMapper;
-        this.categoryService = categoryService;
+        this.userModelMapper = new UserModelMapper(new CategoryModelMapper());
         this.credentialRepository = credentialRepository;
         createAdmin();
         addNotificationSender(emailSender);
@@ -90,10 +88,8 @@ public class UserServiceImpl extends Notifiable implements UserService {
                 passwordEncoder.encode(userRegistrationModel.password()),
                 crypto.encrypt(secretKey.getBytes(StandardCharsets.UTF_8)));
         userRepository.save(user);
-        categoryService.createDefaultSubscription(user);
-        return userModelMapper.map(user);
         registerNotification("Вы успешно зарегистрировались в приложении! \n Ваш секретный ключ для тг: " + secretKey, userRegistrationModel.username());
-        return userModelMapper.build(user);
+        return userModelMapper.map(user);
     }
 
     @Override
@@ -115,10 +111,6 @@ public class UserServiceImpl extends Notifiable implements UserService {
 
     public User getUser(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-    }
-
-    public void addNotificationSender(NotificationSender sender) {
-        addNotificationSender(sender);
     }
 
     /**

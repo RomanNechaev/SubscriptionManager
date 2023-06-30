@@ -36,7 +36,6 @@ public interface UserService extends UserDetailsService {
      * @param username - имя пользователя
      * @return информация о пользователе
      */
-    UserModel getUser(String username);
     UserModel getUserModel(String username);
 
     User getUser(String username) throws UsernameNotFoundException;

@@ -1,13 +1,12 @@
 package ru.matmex.subscription.services.impl;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-
-import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -36,19 +35,18 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
 
 
 @ContextConfiguration(classes = {UserServiceImpl.class, PasswordEncoder.class})
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
     private final UserRepository userRepository = Mockito.mock(UserRepository.class);
-    private final CategoryService categoryService  = Mockito.mock(CategoryService.class);
     private final PasswordEncoder passwordEncoder = Mockito.mock(PasswordEncoder.class);
     private final UserModelMapper userModelMapper = new UserModelMapper(new CategoryModelMapper());
     private final CredentialRepository credentialRepository = Mockito.mock(CredentialRepository.class);
-    private final UserService userService = new UserServiceImpl(userRepository,passwordEncoder,userModelMapper,categoryService);
+    private final EmailNotificationSender emailNotificationSender = Mockito.mock(EmailNotificationSender.class);
+    private final Crypto crypto = Mockito.mock(Crypto.class);
+    private final UserService userService = new UserServiceImpl(userRepository,passwordEncoder,emailNotificationSender,crypto,credentialRepository);
     private final User defaultUser = UserBuilder.anUser().defaultUser();
 
     /**
