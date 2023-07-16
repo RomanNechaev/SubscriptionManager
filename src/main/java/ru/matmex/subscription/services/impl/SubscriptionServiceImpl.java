@@ -58,7 +58,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     public List<Subscription> getSubscriptionsByUser(User user) {
-        List<Category> categories = categoryRepository.findCategoriesByUser(userService.getCurrentUser());
+        List<Category> categories = categoryRepository.findCategoriesByUser(user);
         if (categories.isEmpty()) {
             throw new EntityNotFoundException("Список категорий пуст!");
         }
