@@ -59,10 +59,12 @@ public class GoogleAuthorizationServiceImpl implements GoogleAuthorizationServic
         this.userService = userService;
         init();
     }
+
     @Override
     public Credential getCredentials(String responseUrl) throws IOException {
         return new GoogleCredentialHandler(flow, receiver, userService).authorize(responseUrl);
     }
+
     @Override
     public String getAuthorizationUrl() throws IOException {
         String redirectUri = receiver.getRedirectUri();
@@ -72,7 +74,7 @@ public class GoogleAuthorizationServiceImpl implements GoogleAuthorizationServic
 
     @Override
     public Credential getCurrentUserCredential() throws IOException {
-        return new GoogleCredentialHandler(flow,receiver,userService).loadCredential(userService.getGoogleCredential());
+        return new GoogleCredentialHandler(flow, receiver, userService).loadCredential(userService.getGoogleCredential());
     }
 
     private void init() throws IOException {

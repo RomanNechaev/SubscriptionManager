@@ -4,22 +4,33 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import ru.matmex.subscription.services.notifications.email.EmailNotificationSender;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 @Component
+/**
+ * Шифровальщик персональных данных
+ */
 public class Crypto {
     Cipher cipher;
+    /**
+     * Алгоритм шифрования
+     */
     String transformation = "AES/ECB/PKCS5Padding";
-    private static final Logger logger = LoggerFactory.getLogger(EmailNotificationSender.class);
+    private static final Logger logger = LoggerFactory.getLogger(Crypto.class);
     private final SecretKeySpec secretKey;
 
     public Crypto(@Value("${crypto.secretkey}") String rawSecretKey) {
         this.secretKey = new SecretKeySpec(rawSecretKey.getBytes(), "AES");
     }
 
+    /**
+     * Зашифровать данные
+     *
+     * @param plainText исходные текст в виде последоватлельности байт
+     * @return зашифрованный текст в виде массив байт
+     */
     public byte[] encrypt(byte[] plainText) {
         try {
             cipher = Cipher.getInstance(transformation);
@@ -31,6 +42,12 @@ public class Crypto {
         return null;
     }
 
+    /**
+     * Расшифровать текст
+     *
+     * @param encryptedText - зашифрованный текст
+     * @return расшифрованный текст в виде массива байт
+     */
     public byte[] decrypt(byte[] encryptedText) {
         try {
             cipher = Cipher.getInstance(transformation);

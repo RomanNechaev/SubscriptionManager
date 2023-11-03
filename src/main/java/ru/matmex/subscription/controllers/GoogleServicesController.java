@@ -13,6 +13,7 @@ import ru.matmex.subscription.services.CalendarService;
 @Controller
 public class GoogleServicesController {
     private final CalendarService googleCalendarService;
+
     @Autowired
     public GoogleServicesController(CalendarService googleCalendarService) {
         this.googleCalendarService = googleCalendarService;

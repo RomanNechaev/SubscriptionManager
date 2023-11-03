@@ -6,5 +6,5 @@ import ru.matmex.subscription.entities.GoogleCredential;
 /**
  * Репозитория для работы с учетными данными от гугл аккаунта
  */
-public interface CredentialRepository extends JpaRepository<GoogleCredential,Long> {
+public interface CredentialRepository extends JpaRepository<GoogleCredential, Long> {
 }

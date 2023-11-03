@@ -2,10 +2,8 @@ package ru.matmex.subscription.services.impl;
 
 
 import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
-import com.google.api.services.calendar.model.EventDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +17,8 @@ import ru.matmex.subscription.services.utils.GoogleUtils;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.TimeZone;
 
 @Service
 public class GoogleCalendarService implements CalendarService {
@@ -72,6 +68,7 @@ public class GoogleCalendarService implements CalendarService {
             }
         }
     }
+
     /**
      * Получение гугл-календаря пользователя
      */

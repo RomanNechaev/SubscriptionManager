@@ -12,8 +12,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.matmex.subscription.entities.User;
 import ru.matmex.subscription.entities.GoogleCredential;
+import ru.matmex.subscription.entities.User;
 import ru.matmex.subscription.models.security.Crypto;
 import ru.matmex.subscription.models.user.Role;
 import ru.matmex.subscription.models.user.UserModel;
@@ -23,7 +23,6 @@ import ru.matmex.subscription.repositories.CredentialRepository;
 import ru.matmex.subscription.repositories.UserRepository;
 import ru.matmex.subscription.services.UserService;
 import ru.matmex.subscription.services.notifications.Notifiable;
-import ru.matmex.subscription.services.notifications.NotificationSender;
 import ru.matmex.subscription.services.notifications.email.EmailNotificationSender;
 import ru.matmex.subscription.services.utils.mapping.CategoryModelMapper;
 import ru.matmex.subscription.services.utils.mapping.UserModelMapper;
@@ -160,7 +159,6 @@ public class UserServiceImpl extends Notifiable implements UserService {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         userRepository.delete(user);
         registerNotification("Пользователь " + username + " успешно удален", username);
-        //TODO передать юзера
         return "Пользователь успешно удален!";
     }
 
@@ -176,6 +174,7 @@ public class UserServiceImpl extends Notifiable implements UserService {
         User currentUser = getCurrentUser();
         return currentUser.getGoogleCredential();
     }
+
     @Override
     public GoogleCredential getGoogleCredential(String username) {
         User user = userRepository
@@ -183,6 +182,7 @@ public class UserServiceImpl extends Notifiable implements UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User with name:" + username + "not found"));
         return user.getGoogleCredential();
     }
+
     @Override
     public void setGoogleCredential(Credential credential) {
         User currentUser = getCurrentUser();

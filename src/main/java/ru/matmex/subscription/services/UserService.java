@@ -8,7 +8,6 @@ import ru.matmex.subscription.entities.User;
 import ru.matmex.subscription.models.user.UserModel;
 import ru.matmex.subscription.models.user.UserRegistrationModel;
 import ru.matmex.subscription.models.user.UserUpdateModel;
-import ru.matmex.subscription.services.notifications.Notifiable;
 
 import java.io.IOException;
 import java.util.List;

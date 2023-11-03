@@ -1,6 +1,9 @@
 package ru.matmex.subscription.models.security;
 
-import com.google.api.client.auth.oauth2.*;
+import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
+import com.google.api.client.auth.oauth2.AuthorizationCodeResponseUrl;
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.extensions.java6.auth.oauth2.VerificationCodeReceiver;
 import com.google.api.client.util.Preconditions;
 import ru.matmex.subscription.entities.GoogleCredential;
@@ -24,6 +27,7 @@ public class GoogleCredentialHandler {
 
     /**
      * Авторизовать учетные данные от гугл аккаунта
+     *
      * @param responseUrl - ссылка, после авторизации гугл аккаунта в браузере
      * @return авторизованные учетные данные
      * @throws IOException
@@ -50,6 +54,7 @@ public class GoogleCredentialHandler {
 
     /**
      * Преобразовать учетные данные к валидному состоянию
+     *
      * @param credential - учетные данные из БД
      * @return валидные учетные данные пользователя
      */
@@ -63,6 +68,7 @@ public class GoogleCredentialHandler {
 
     /**
      * Создать новые учетные данные
+     *
      * @return учетные данные пользователя
      */
     private Credential newCredential() {

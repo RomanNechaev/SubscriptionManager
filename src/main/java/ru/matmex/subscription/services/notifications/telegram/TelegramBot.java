@@ -53,6 +53,7 @@ public class TelegramBot extends TelegramLongPollingBot implements NotificationS
 
     /**
      * Получить имя тг бота
+     *
      * @return имя тг бота
      */
     @Override
