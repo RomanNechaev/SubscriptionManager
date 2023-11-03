@@ -17,11 +17,12 @@ public class User {
     public User() {
     }
 
-    public User(String username, String email, String password) {
+    public User(String username, String email, String password, byte[] telegramSecretKey) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.categories = new ArrayList<>();
+        this.telegramSecretKey = telegramSecretKey;
         roles.add(Role.USER);
     }
 
@@ -39,7 +40,13 @@ public class User {
 
     private String username;
 
+    private Long telegramChatId;
+    @OneToOne
+    @JoinColumn(name = "google_credential_id")
+    private GoogleCredential googleCredential;
     private String password;
+
+    private byte[] telegramSecretKey;
 
     private String email;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
@@ -85,6 +92,26 @@ public class User {
 
     public List<Category> getCategories() {
         return categories;
+    }
+
+    public GoogleCredential getGoogleCredential() {
+        return googleCredential;
+    }
+
+    public void setGoogleCredential(GoogleCredential googleCredential) {
+        this.googleCredential = googleCredential;
+    }
+
+    public Long getTelegramChatId() {
+        return telegramChatId;
+    }
+
+    public void setTelegramChatId(long telegramChatId) {
+        this.telegramChatId = telegramChatId;
+    }
+
+    public byte[] getTelegramSecretKey() {
+        return telegramSecretKey;
     }
 
 }
